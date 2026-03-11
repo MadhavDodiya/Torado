@@ -22,6 +22,9 @@ import service2 from '../assets/Image/service2.jpg'
 import service3 from '../assets/Image/service3.jpg'
 import service4 from '../assets/Image/service4.jpg'
 import service5 from '../assets/Image/service5.jpg'
+import blog1 from '../assets/Image/blog1.jpg'
+import blog2 from '../assets/Image/blog2.jpg'
+import blog3 from '../assets/Image/blog3.jpg'
 import aboutImage from '../assets/Image/imgi_13_about1.png'
 import maps from '../assets/Image/imgi_37_map.png'
 import logo1 from '../assets/Image/imgi_38_logo.png'
@@ -30,7 +33,8 @@ import team1 from '../assets/Image/team1.jpg'
 import team2 from '../assets/Image/team2.jpg'
 import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
-import { getPagePath } from '../siteContent'
+
+const getPagePath = (pageId) => (pageId === 'home' ? '/' : `/${pageId}`)
 
 const getVisibleSlides = () => {
     if (typeof window === 'undefined') return 3
@@ -238,6 +242,31 @@ function Home() {
         ],
         [],
     )
+
+    const blogs = [
+        {
+            id: 1,
+            category: "BUSINESS & FINANCE",
+            title: "How To Start Getting More Of a Return From Your Savings",
+            image: blog1,
+            date: "19",
+        },
+        {
+            id: 2,
+            category: "FINANCE",
+            title: "Consulted Admitting Wooded Is Power Acuteness",
+            image: blog2,
+            date: "23",
+            dark: true,
+        },
+        {
+            id: 3,
+            category: "BUSINESS",
+            title: "Popular Consultants are Big Meetup 2025",
+            image: blog3,
+            date: "15",
+        },
+    ];
 
     const totalGrowthSlides = serviceGrowth.length
     const [visibleSlides, setVisibleSlides] = useState(() => getVisibleSlides())
@@ -596,7 +625,7 @@ function Home() {
                         {serviceGrowth.map((item, index) => {
                             const isActive =
                                 ((growthSlide - visibleSlides) % totalGrowthSlides + totalGrowthSlides) %
-                                    totalGrowthSlides ===
+                                totalGrowthSlides ===
                                 index
 
                             return (
@@ -1161,7 +1190,7 @@ function Home() {
                         {testimonials.map((item, index) => {
                             const isActive =
                                 ((testimonialSlide - testimonialVisible) % totalTestimonials + totalTestimonials) %
-                                    totalTestimonials ===
+                                totalTestimonials ===
                                 index
 
                             return (
@@ -1185,6 +1214,53 @@ function Home() {
                         TORADO started its march with providing assistants in
                         <span className="text-pink-500 font-semibold"> 1999</span>. Initially
                         they provide financial assistance within the country.
+                    </div>
+                </div>
+            </section>
+
+            <section className="bg-gray-100 py-20">
+                <div className="max-w-7xl mx-auto px-4">
+
+                    {/* Heading */}
+                    <div className="text-center mb-14">
+                        <p className="text-pink-600 font-semibold tracking-widest">
+                            BLOG & NEWS
+                        </p>
+
+                        <h2 className="text-4xl md:text-5xl font-bold text-[#1b2940] mt-3">
+                            Consulter Latest Blog & News
+                        </h2>
+                    </div>
+
+                    {/* Cards */}
+                    <div className="blog-news-grid grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {blogs.map((blog) => (
+                            <article key={blog.id} className="blog-news-card">
+
+                                {/* Image */}
+                                <div className="relative overflow-hidden">
+                                    <img src={blog.image} className="blog-news-image" alt={blog.title} />
+
+                                    {/* Date */}
+                                    <div className="blog-news-date">
+                                        <p className="text-2xl font-bold">{blog.date}</p>
+                                        <p className="text-xs">Jul</p>
+                                        <p className="text-xs">2025</p>
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="blog-news-content">
+                                    <p className="blog-news-category">{blog.category}</p>
+
+                                    <h3 className="blog-news-title">{blog.title}</h3>
+
+                                    <button className="blog-news-button" type="button">
+                                        READ MORE
+                                    </button>
+                                </div>
+                            </article>
+                        ))}
                     </div>
                 </div>
             </section>

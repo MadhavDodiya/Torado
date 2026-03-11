@@ -3,7 +3,21 @@ import { Link } from 'react-router-dom'
 import { FaAngleDoubleRight, FaArrowUp, FaBell } from 'react-icons/fa'
 import post1 from '../assets/Image/service1.jpg'
 import post2 from '../assets/Image/service2.jpg'
-import { footerLinkMap, getPagePath } from '../siteContent'
+
+const getPagePath = (pageId) => (pageId === 'home' ? '/' : `/${pageId}`)
+
+const footerLinkMap = {
+  'About Us': 'about',
+  'Our Team': 'team',
+  'Our Projects': 'projects',
+  'Latest News': 'blog',
+  'Contact Us': 'contact',
+  'Financial Advice': 'financial-analysis',
+  'Planning Strategies': 'services',
+  'Taxation Planning': 'taxation-planning',
+  'Investment Trading': 'investment-trading',
+  'Wealth Marketing': 'services',
+}
 
 function Footer() {
   const [email, setEmail] = useState('')

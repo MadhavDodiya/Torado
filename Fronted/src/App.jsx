@@ -1,10 +1,17 @@
 import { useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 import Home from './Pages/Home'
-import ContentPage from './Pages/ContentPage'
-import { getPageIdFromPath, pageContent } from './siteContent'
+import Service from './Pages/Service'
+
+const getPageIdFromPath = (pathname) => {
+  if (!pathname || pathname === '/') {
+    return 'home'
+  }
+
+  return pathname.replace(/^\/+|\/+$/g, '') || 'home'
+}
 
 function ScrollToTop() {
   const location = useLocation()
@@ -14,16 +21,6 @@ function ScrollToTop() {
   }, [location.pathname])
 
   return null
-}
-
-function ContentRoute() {
-  const { pageId } = useParams()
-
-  if (!pageId || !(pageId in pageContent)) {
-    return <Navigate to="/" replace />
-  }
-
-  return <ContentPage pageId={pageId} />
 }
 
 function AppLayout({ children }) {
@@ -53,10 +50,74 @@ function App() {
           }
         />
         <Route
-          path="/:pageId"
+          path="/services"
           element={
             <AppLayout>
-              <ContentRoute />
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/team"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/financial-analysis"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/taxation-planning"
+          element={
+            <AppLayout>
+              <Service />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/investment-trading"
+          element={
+            <AppLayout>
+              <Service />
             </AppLayout>
           }
         />

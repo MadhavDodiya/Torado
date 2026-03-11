@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FaBars,
@@ -14,34 +14,67 @@ import {
   FaTwitter,
 } from 'react-icons/fa'
 import logo from '../assets/Image/imgi_1_logo.png'
-import { getPagePath, navItems } from '../siteContent'
 
-const parentLookup = navItems.reduce((accumulator, item) => {
-  accumulator[item.id] = item.id
-
-  if (item.children) {
-    item.children.forEach((child) => {
-      accumulator[child.id] = item.id
-    })
-  }
-
-  return accumulator
-}, {})
-
-const getPrimaryPath = (item) => getPagePath(item.children?.[0]?.id ?? item.id)
+const linkResetStyle = { textDecoration: 'none' }
 
 export default function Header({ currentPage }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(null)
+  const navRef = useRef(null)
+  const closeTimer = useRef(null)
 
-  const activeParent = parentLookup[currentPage] ?? currentPage
+  const closeMenus = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+    setMobileOpen(false)
+    setOpenDropdown(null)
+  }
+
+  const isActive = (paths) => paths.includes(currentPage)
+
+  const toggleDropdown = (name) => {
+    setOpenDropdown((prev) => (prev === name ? null : name))
+  }
+
+  const startCloseTimer = () => {
+    closeTimer.current = setTimeout(() => {
+      setOpenDropdown(null)
+    }, 150)
+  }
+
+  const cancelCloseTimer = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+  }
+
+  const handleMouseEnter = (name) => {
+    cancelCloseTimer()
+    setOpenDropdown(name)
+  }
+
+  const handleMouseLeave = () => {
+    startCloseTimer()
+  }
 
   useEffect(() => {
-    setOpenDropdown(null)
-    setMobileOpen(false)
-  }, [currentPage])
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current)
+    }
+  }, [])
 
-  const mobileItems = useMemo(() => navItems, [])
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
   return (
     <header className="w-full">
@@ -59,98 +92,151 @@ export default function Header({ currentPage }) {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            {['Help', 'Support', 'Contact'].map((item, index, arr) => (
-              <span key={item} className="flex items-center gap-3">
-                <Link
-                  to={getPagePath('contact')}
-                  className="text-sm text-white/85 transition-colors hover:text-white"
-                >
-                  {item}
-                </Link>
-                {index < arr.length - 1 && <span className="text-white/40">/</span>}
-              </span>
-            ))}
+            <span className="flex items-center gap-3">
+              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Help</Link>
+              <span className="text-white/40">/</span>
+            </span>
+            <span className="flex items-center gap-3">
+              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Support</Link>
+              <span className="text-white/40">/</span>
+            </span>
+            <span className="flex items-center gap-3">
+              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Contact</Link>
+            </span>
+
             <div className="ml-4 flex items-center gap-3 text-base text-white/60">
-              <button type="button" aria-label="Facebook" className="transition-colors hover:text-white">
-                <FaFacebookF />
-              </button>
-              <button type="button" aria-label="Twitter" className="transition-colors hover:text-white">
-                <FaTwitter />
-              </button>
-              <button type="button" aria-label="Instagram" className="transition-colors hover:text-white">
-                <FaInstagram />
-              </button>
-              <button type="button" aria-label="LinkedIn" className="transition-colors hover:text-white">
-                <FaLinkedinIn />
-              </button>
+              <Link to="/" onClick={closeMenus} aria-label="Facebook" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaFacebookF /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="Twitter" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaTwitter /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="Instagram" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaInstagram /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="LinkedIn" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaLinkedinIn /></Link>
             </div>
           </div>
         </div>
       </div>
 
-      <nav className="border-b border-slate-100 bg-white shadow-sm">
+      <nav ref={navRef} className="border-b border-slate-100 bg-white shadow-sm">
         <div className="mx-auto flex h-[96px] max-w-[1400px] items-center px-4 lg:px-8">
-          <Link to={getPagePath('home')} className="shrink-0" aria-label="Go to Home">
+          <Link to="/" onClick={closeMenus} className="shrink-0 no-underline" aria-label="Go to Home" style={linkResetStyle}>
             <img src={logo} alt="Torado logo" className="h-12 w-auto" />
           </Link>
 
           <ul className="ml-10 hidden items-center gap-8 lg:flex">
-            {navItems.map((item) => {
-              const isActive = activeParent === item.id
 
-              return (
-                <li
-                  key={item.id}
-                  className="relative"
-                  onMouseEnter={() => item.children && setOpenDropdown(item.id)}
-                  onMouseLeave={() => item.children && setOpenDropdown((prev) => (prev === item.id ? null : prev))}
+            {/* Home */}
+            <li>
+              <Link
+                to="/"
+                onClick={closeMenus}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['home']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                style={linkResetStyle}
+              >
+                Home
+              </Link>
+            </li>
+
+            {/* Services dropdown */}
+            <li
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('services')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="flex items-center gap-2">
+                <Link to="/services" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['services', 'financial-analysis', 'taxation-planning', 'investment-trading']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                  Services
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('services') }}
+                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'services' ? 'rotate-180' : ''}`}
+                  aria-label="Toggle Services dropdown">
+                  <FaChevronDown />
+                </button>
+              </div>
+
+              {openDropdown === 'services' && (
+                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
+                  <li><Link to="/services" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['services']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>All Services</Link></li>
+                  <li><Link to="/financial-analysis" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['financial-analysis']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Financial Analysis</Link></li>
+                </ul>
+              )}
+            </li>
+
+            {/* Pages dropdown */}
+            <li
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('pages')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/about"
+                  onClick={closeMenus}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['about', 'projects', 'contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                  style={linkResetStyle}
                 >
-                  <div className="flex items-center gap-2">
-                    <Link
-                      to={getPrimaryPath(item)}
-                      className={`text-lg font-semibold transition-colors ${
-                        isActive ? 'text-[#f00455]' : 'text-[#1b2940] hover:text-[#f00455]'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
+                  Pages
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('pages') }}
+                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'pages' ? 'rotate-180' : ''}`}
+                  aria-label="Toggle Pages dropdown"
+                >
+                  <FaChevronDown />
+                </button>
+              </div>
 
-                    {item.children && (
-                      <button
-                        type="button"
-                        onClick={() => setOpenDropdown((prev) => (prev === item.id ? null : item.id))}
-                        className={`text-sm transition-colors ${
-                          isActive ? 'text-[#f00455]' : 'text-[#1b2940] hover:text-[#f00455]'
-                        }`}
-                        aria-label={`Toggle ${item.label} menu`}
-                      >
-                        <FaChevronDown className={`opacity-70 transition-transform ${openDropdown === item.id ? 'rotate-180' : ''}`} />
-                      </button>
-                    )}
-                  </div>
+              {openDropdown === 'pages' && (
+                <ul
+                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
+                  onMouseEnter={cancelCloseTimer}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <li><Link to="/about" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['about']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>About Us</Link></li>
+                  <li><Link to="/projects" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['projects']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Projects</Link></li>
+                  <li><Link to="/contact" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['contact']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Contact Us</Link></li>
+                </ul>
+              )}
+            </li>
 
-                  {item.children && openDropdown === item.id && (
-                    <div className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.id}
-                          to={getPagePath(child.id)}
-                          className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors ${
-                            currentPage === child.id
-                              ? 'bg-[#fff1f6] text-[#f00455]'
-                              : 'text-[#1b2940] hover:bg-slate-50 hover:text-[#f00455]'
-                          }`}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </li>
-              )
-            })}
+            {/* Team */}
+            <li>
+              <Link
+                to="/team"
+                onClick={closeMenus}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['team']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                style={linkResetStyle}
+              >
+                Team
+              </Link>
+            </li>
+
+            {/* Blog */}
+            <li>
+              <Link
+                to="/blog"
+                onClick={closeMenus}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                style={linkResetStyle}
+              >
+                Blog
+              </Link>
+            </li>
+
+            {/* Contact */}
+            <li>
+              <Link
+                to="/contact"
+                onClick={closeMenus}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                style={linkResetStyle}
+              >
+                Contact
+              </Link>
+            </li>
           </ul>
 
+          {/* Desktop right */}
           <div className="ml-auto hidden items-center gap-5 lg:flex">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f00455] text-base text-white">
@@ -162,22 +248,16 @@ export default function Header({ currentPage }) {
               </div>
             </div>
 
-            <Link
-              to={getPagePath('blog')}
-              aria-label="Search"
-              className="text-2xl text-[#1b2940] transition-colors hover:text-[#f00455]"
-            >
+            <Link to="/blog" onClick={closeMenus} aria-label="Search" className="text-2xl text-black no-underline transition-colors hover:text-[#f00455]" style={linkResetStyle}>
               <FaSearch />
             </Link>
 
-            <Link
-              to={getPagePath('contact')}
-              className="h-12 rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#d30049]"
-            >
+            <Link to="/contact" onClick={closeMenus} className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]" style={linkResetStyle}>
               BOOK A CONSULTATION
             </Link>
           </div>
 
+          {/* Mobile hamburger */}
           <button
             type="button"
             aria-label="Toggle menu"
@@ -188,56 +268,43 @@ export default function Header({ currentPage }) {
           </button>
         </div>
 
+        {/* Mobile menu */}
         {mobileOpen && (
           <div className="border-t border-slate-100 px-4 pb-6 pt-4 lg:hidden">
             <ul className="space-y-2">
-              {mobileItems.map((item) => (
-                <li key={`mobile-${item.id}`} className="rounded-lg border border-slate-100">
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <Link
-                      to={getPrimaryPath(item)}
-                      className={`text-sm font-semibold ${
-                        activeParent === item.id ? 'text-[#f00455]' : 'text-[#1b2940]'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-
-                    {item.children && (
-                      <button
-                        type="button"
-                        onClick={() => setOpenDropdown((prev) => (prev === item.id ? null : item.id))}
-                        className="text-[#1b2940]"
-                        aria-label={`Toggle ${item.label} menu`}
-                      >
-                        <FaChevronDown className={`transition-transform ${openDropdown === item.id ? 'rotate-180' : ''}`} />
-                      </button>
-                    )}
-                  </div>
-
-                  {item.children && openDropdown === item.id && (
-                    <div className="space-y-1 border-t border-slate-100 bg-slate-50 p-2">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.id}
-                          to={getPagePath(child.id)}
-                          className={`block w-full rounded-md px-3 py-2 text-left text-sm ${
-                            currentPage === child.id ? 'bg-white text-[#f00455]' : 'text-[#1b2940]'
-                          }`}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </li>
-              ))}
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['home']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Home</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/services" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['services']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Services</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/financial-analysis" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['financial-analysis']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Financial Analysis</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/taxation-planning" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['taxation-planning']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Taxation Planning</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/investment-trading" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['investment-trading']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Investment Trading</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/about" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['about']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>About Us</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/projects" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['projects']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Projects</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/team" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['team']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/blog" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
+              </li>
+              <li className="rounded-lg border border-slate-100">
+                <Link to="/contact" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Contact</Link>
+              </li>
             </ul>
 
-            <Link
-              to={getPagePath('contact')}
-              className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#d30049]"
-            >
+            <Link to="/contact" onClick={closeMenus} className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]" style={linkResetStyle}>
               BOOK A CONSULTATION
             </Link>
           </div>
