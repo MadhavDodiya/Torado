@@ -141,7 +141,7 @@ export default function Header({ currentPage }) {
               onMouseLeave={handleMouseLeave}
             >
               <div className="flex items-center gap-2">
-                <Link to="/services" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['services', 'financial-analysis', 'taxation-planning', 'investment-trading']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                <Link to="/services" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['services']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
                   Services
                 </Link>
                 <button
@@ -155,7 +155,7 @@ export default function Header({ currentPage }) {
 
               {openDropdown === 'services' && (
                 <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
-                  <li><Link to="/services" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['services']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>All Services</Link></li>
+                  <li><Link to="/services" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['services']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Services</Link></li>
                   <li><Link to="/financial-analysis" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['financial-analysis']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Financial Analysis</Link></li>
                 </ul>
               )}

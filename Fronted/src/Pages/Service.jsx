@@ -81,7 +81,7 @@ const steps = [
   },
 ]
 
-function Service() {
+function Service({ pageTitle = 'Our Services' }) {
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -99,14 +99,16 @@ function Service() {
             <div className="relative z-10">
               {/* Breadcrumb */}
               <p className="flex items-center gap-2 text-base mb-4">
-                <span className="text-slate-300">Home</span>
+                <Link to="/" className="text-slate-300 no-underline hover:text-white">
+                  Home
+                </Link>
                 <span className="text-slate-400 text-sm">|</span>
-                <span className="text-red-500 font-medium">Our Services</span>
+                <span className="text-red-500 font-medium">{pageTitle}</span>
               </p>
 
               {/* Heading */}
               <h1 className="text-5xl lg:text-6xl font-extrabold text-white leading-tight">
-                Our Services
+                {pageTitle}
               </h1>
             </div>
           </div>
@@ -238,9 +240,12 @@ function Service() {
           </h1>
 
           {/* Button */}
-          <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 font-semibold rounded-md transition">
+          <Link
+            to="/contact"
+            className="inline-block no-underline bg-red-500 hover:bg-red-600 text-white px-8 py-4 font-semibold rounded-md transition"
+          >
             CONTACT US
-          </button>
+          </Link>
 
         </div>
 
