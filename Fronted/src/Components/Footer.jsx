@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaAngleDoubleRight, FaArrowUp, FaBell } from 'react-icons/fa'
 import post1 from '../assets/Image/service1.jpg'
@@ -21,8 +21,22 @@ const footerLinkMap = {
 
 function Footer() {
   const [email, setEmail] = useState('')
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowScrollTop(window.scrollY > 220)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [])
 
   const usefulLinks = ['About Us', 'Our Team', 'Our Projects', 'Latest News', 'Contact Us']
   const whatWeDo = [
@@ -386,17 +400,23 @@ function Footer() {
 
       <button
         onClick={scrollToTop}
-        className="btn d-flex align-items-center justify-content-center rounded-circle shadow"
+        className="d-flex align-items-center justify-content-center shadow"
         style={{
           position: 'fixed',
-          bottom: 24,
+          bottom: 20,
           right: 24,
           width: 44,
           height: 44,
+          padding: 0,
+          borderRadius: '9999px',
           background: '#e61b50',
           border: 'none',
           color: '#fff',
-          zIndex: 50,
+          zIndex: 9999,
+          opacity: showScrollTop ? 1 : 0,
+          pointerEvents: showScrollTop ? 'auto' : 'none',
+          transform: showScrollTop ? 'translateY(0)' : 'translateY(8px)',
+          transition: 'opacity 0.2s ease, transform 0.2s ease',
         }}
         aria-label="Scroll to top"
       >
