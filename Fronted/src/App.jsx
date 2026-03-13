@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Home from './Pages/Home'
 import Service from './Pages/Service'
-import Financial from './Pages/Financial'
+import ServiceDetail from './Pages/ServiceDetail'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 
@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Service pageTitle="Our Services" />} />
-        <Route path="/financial-analysis" element={<Financial />} />
+        <Route path="/service-detail" element={<ServiceDetail pageTitle="Service Detail"/>} />
         <Route path="*" element={<Home />} />
       </Routes>
       <Footer />
