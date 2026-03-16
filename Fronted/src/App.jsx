@@ -9,6 +9,7 @@ import Testimonials from './Pages/Testimonials'
 import Privacypolicy from './Pages/Privacypolicy'
 import TermAndCondition from './Pages/Term&condition'
 import Portfolio from './Pages/Portfolio'
+import Teams from './Pages/Teams'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 
@@ -26,6 +27,8 @@ function App() {
         <Route path="/aboutus" element={<Aboutus pageTitle="About Us" />} />
         <Route path="/pricingplan" element={<Pricingplans />} />
         <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/teams" element={<Teams pageTitle="Team" />} />
+        <Route path="/team" element={<Teams pageTitle="Team" />} />
         <Route path="/faqs" element={<Faqs pageTitle="Faq's" />} />
         <Route path="/testimonials" element={<Testimonials pageTitle="Testimonials" />} />
         <Route path="/privacy-policy" element={<Privacypolicy pageTitle="Privacy Policy" />} />
