@@ -118,11 +118,10 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
                 <button
                   type="button"
                   onClick={() => setBilling('monthly')}
-                  className={`rounded-full px-6 py-2 text-sm font-semibold transition ${
-                    billing === 'monthly'
+                  className={`rounded-full px-6 py-2 text-sm font-semibold transition ${billing === 'monthly'
                       ? 'bg-[#e61b50] text-white'
                       : 'text-gray-600 hover:text-[#0f1f3d]'
-                  }`}
+                    }`}
                 >
                   Monthly
                 </button>
@@ -130,11 +129,10 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
                 <button
                   type="button"
                   onClick={() => setBilling('yearly')}
-                  className={`rounded-full px-6 py-2 text-sm font-semibold transition ${
-                    billing === 'yearly'
+                  className={`rounded-full px-6 py-2 text-sm font-semibold transition ${billing === 'yearly'
                       ? 'bg-[#e61b50] text-white'
                       : 'text-gray-600 hover:text-[#0f1f3d]'
-                  }`}
+                    }`}
                 >
                   Yearly
                   <span className="ml-2 rounded-full bg-[#0f1f3d] px-2 py-0.5 text-[10px] font-bold text-white">
@@ -150,11 +148,10 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
               <button
                 key={plan.id}
                 type="button"
-                className={`relative overflow-hidden rounded-2xl border text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${
-                  plan.featured
+                className={`relative overflow-hidden rounded-2xl border text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${plan.featured
                     ? 'border-[#e61b50] bg-[#0f1f3d] text-white'
                     : 'border-slate-200 bg-white text-[#17253d]'
-                }`}
+                  }`}
               >
                 {plan.featured && (
                   <span className="absolute right-4 top-4 rounded-full bg-[#e61b50] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
@@ -164,9 +161,8 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
 
                 <div className="p-8">
                   <p
-                    className={`text-xs font-bold uppercase tracking-[0.18em] ${
-                      plan.featured ? 'text-[#ff8fb0]' : 'text-[#e61b50]'
-                    }`}
+                    className={`text-xs font-bold uppercase tracking-[0.18em] ${plan.featured ? 'text-[#ff8fb0]' : 'text-[#e61b50]'
+                      }`}
                   >
                     {plan.name}
                   </p>
@@ -186,11 +182,10 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
                 </div>
 
                 <div
-                  className={`border-y px-8 py-4 text-xs font-semibold uppercase tracking-wide ${
-                    plan.featured
+                  className={`border-y px-8 py-4 text-xs font-semibold uppercase tracking-wide ${plan.featured
                       ? 'border-white/15 bg-white/5 text-white/80'
                       : 'border-slate-200 bg-slate-50 text-slate-500'
-                  }`}
+                    }`}
                 >
                   This Plan Includes Global Relations
                 </div>
@@ -225,11 +220,10 @@ function Pricingplans({ pageTitle = 'Pricing Plan' }) {
                 <div className="px-8 pb-8">
                   <Link
                     to="/contact"
-                    className={`block rounded-md px-8 py-3 text-center text-sm font-bold uppercase tracking-wide no-underline transition ${
-                      plan.featured
+                    className={`block rounded-md px-8 py-3 text-center text-sm font-bold uppercase tracking-wide no-underline transition ${plan.featured
                         ? 'bg-[#e61b50] text-white hover:bg-[#d41749]'
                         : 'border border-[#e61b50] text-[#e61b50] hover:bg-[#e61b50] hover:text-white'
-                    }`}
+                      }`}
                   >
                     {plan.cta}
                   </Link>

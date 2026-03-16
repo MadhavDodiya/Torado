@@ -201,16 +201,39 @@ export default function Header({ currentPage }) {
               )}
             </li>
 
-            {/* Team */}
-            <li>
-              <Link
-                to="/team"
-                onClick={closeMenus}
-                className={`text-lg font-semibold no-underline transition-colors ${isActive(['team']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
-                style={linkResetStyle}
-              >
-                Team
-              </Link>
+            {/* Team dropdown */}
+            <li
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('team')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/aboutus"
+                  onClick={closeMenus}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['team']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                  style={linkResetStyle}
+                >
+                  Team
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('team', "teams", "teamdetails") }}
+                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'team' ? 'rotate-180' : ''}`}
+                  aria-label="Toggle Team dropdown">
+                  <FaChevronDown />
+                </button>
+              </div>
+
+              {openDropdown === 'team' && (
+                <ul
+                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
+                  onMouseEnter={cancelCloseTimer}
+                  onMouseLeave={handleMouseLeave}>
+                  <li><Link to="/teams" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teams']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team</Link></li>
+                  <li><Link to="/teamdetails" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teamdetails']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team Details</Link></li>
+                </ul>
+              )}
             </li>
 
             {/* Blog */}
@@ -296,7 +319,20 @@ export default function Header({ currentPage }) {
                 <Link to="/projects" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['projects']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Projects</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/team" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['team']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team</Link>
+                <button
+                  type="button"
+                  onClick={() => toggleDropdown('team-mobile')}
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-black"
+                >
+                  Team
+                  <FaChevronDown className={`transition-transform ${openDropdown === 'team-mobile' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'team-mobile' && (
+                  <div className="space-y-1 border-t border-slate-100 px-2 pb-2 pt-1">
+                    <Link to="/aboutus" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['aboutus']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team</Link>
+                    <Link to="/testimonials" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['testimonials']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team Details</Link>
+                  </div>
+                )}
               </li>
               <li className="rounded-lg border border-slate-100">
                 <Link to="/blog" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
