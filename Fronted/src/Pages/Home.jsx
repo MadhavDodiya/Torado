@@ -1024,7 +1024,7 @@ function Home() {
 
             </section>
 
-            <section className="bg-gray-100 py-24">
+            <section className=" py-24">
                 <div className="max-w-7xl mx-auto px-6 text-center">
 
                     {/* Title */}
