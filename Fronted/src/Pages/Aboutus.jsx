@@ -487,7 +487,7 @@ function Aboutus({ pageTitle = 'About Us' }) {
                                             <div className="service-growth-content">
                                                 <h3>{item.title}</h3>
                                                 <p>{item.description}</p>
-                                                <Link to="/services">Read More -&gt;</Link>
+                                        <Link to="/service-detail">Read More -&gt;</Link>
                                             </div>
                                         </div>
                                     </article>

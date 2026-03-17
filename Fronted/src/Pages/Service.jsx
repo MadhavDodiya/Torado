@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   FaChartLine,
   FaCogs,
@@ -82,6 +82,8 @@ const steps = [
 ]
 
 function Service({ pageTitle = 'Our Services' }) {
+  const navigate = useNavigate()
+
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -151,13 +153,24 @@ function Service({ pageTitle = 'Our Services' }) {
           <div className="service-growth-grid">
             {serviceGrowth.map((item, index) => (
               <article key={`${item.title}-${index}`} className="service-growth-grid-item">
-                <div className="service-growth-card">
+                <div
+                  className="service-growth-card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate('/service-detail', { state: { service: item } })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      navigate('/service-detail', { state: { service: item } })
+                    }
+                  }}
+                >
                   <img src={item.image} alt={item.title} className="service-growth-image" />
                   <div className="service-growth-icon">{item.icon}</div>
                   <div className="service-growth-content">
                     <h3>{item.title}</h3>
                     <p>{item.description}</p>
-                    <Link to="/services">Read More -&gt;</Link>
+                    <Link to="/service-detail" state={{ service: item }}>Read More -&gt;</Link>
                   </div>
                 </div>
               </article>

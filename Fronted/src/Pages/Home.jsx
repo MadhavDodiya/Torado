@@ -603,7 +603,7 @@ function Home() {
                                             <div className="service-growth-content">
                                                 <h3>{item.title}</h3>
                                                 <p>{item.description}</p>
-                                                <Link to={getPagePath('services')}>Read More -&gt;</Link>
+                                    <Link to={getPagePath('service-detail')}>Read More -&gt;</Link>
                                             </div>
                                         </div>
                                     </article>
