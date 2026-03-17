@@ -1,5 +1,13 @@
 ﻿import React from 'react'
 import { Link } from 'react-router-dom'
+import {
+  FaArrowRight,
+  FaSearch,
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+} from 'react-icons/fa'
 import heroImg from '../assets/Image/service-bg.jpg'
 
 function BlogDetails({ pageTitle = 'Blog Details' }) {
@@ -45,7 +53,201 @@ function BlogDetails({ pageTitle = 'Blog Details' }) {
         </div>
       </section>
 
-      
+      <section className="bg-[#f5f5f5] py-12">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <div className="relative">
+              <img
+                src="https://images.unsplash.com/photo-1556761175-b413da4baf72"
+                alt="blog"
+                className="h-[350px] w-full rounded object-cover md:h-[450px]"
+              />
+
+              <div className="absolute left-6 top-6 rounded bg-red-600 px-4 py-3 text-center text-white">
+                <h3 className="text-xl font-bold">19</h3>
+                <p className="text-sm">Jul</p>
+                <p className="text-xs">2025</p>
+              </div>
+            </div>
+
+            <p className="mt-6 text-sm font-semibold tracking-wide text-red-600">
+              BUSINESS & FINANCE
+            </p>
+
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-[#0f172a] md:text-5xl">
+              How To Start Getting More Of a Return From Your Savings
+            </h1>
+
+            <p className="mt-6 leading-relaxed text-gray-500">
+              Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque, odio eu tempor pulvinar magna tortor finibus lorem, ut mattis tellus nunc ut quam. Curabitur quis ornare leo. Suspendisse bibendum nibh non turpis vestibulum pellentesque consectetur adipisci lorem ipsum dolor sit amet.
+              <br />
+              Pras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque.
+              <br />
+              Mras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque.
+            </p>
+
+            <div className="mt-12">
+              <div className="flex flex-col items-start justify-between gap-6 border-t pt-6 md:flex-row md:items-center">
+                <div className="flex flex-wrap items-center gap-4">
+                  <span className="font-semibold text-gray-700">Tags</span>
+
+                  <div className="flex gap-3">
+                    <span className="rounded bg-gray-100 px-4 py-2 text-sm">
+                      Business
+                    </span>
+                    <span className="rounded bg-gray-100 px-4 py-2 text-sm">
+                      Development
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  {[FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn].map((Icon, i) => (
+                    <div
+                      key={i}
+                      className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-600 hover:text-white"
+                    >
+                      <Icon />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                <div className="rounded bg-gray-100 p-6">
+                  <p className="font-medium leading-relaxed text-gray-800">
+                    Consulted Admitting Wooded Is Power Acuteness
+                  </p>
+                </div>
+
+                <div className="rounded bg-gray-100 p-6 text-right">
+                  <p className="font-medium leading-relaxed text-gray-800">
+                    Popular Consultants are Big Meetup 2025
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-12">
+                <h2 className="mb-8 text-2xl font-bold md:text-3xl">
+                  2 Comments
+                </h2>
+
+                <div className="flex gap-5 border-b pb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/44.jpg"
+                    alt="user"
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+
+                  <div>
+                    <h4 className="text-lg font-semibold">Luna Camila</h4>
+                    <p className="mb-2 text-sm text-gray-500">IT-Executive</p>
+
+                    <p className="leading-relaxed text-gray-600">
+                      Mras enim urna, interdum nec porttitor vitae, sollicitudin eu
+                      eros. Praesent eget mollis nulla nonl donec sit amet neque auctor,
+                      ornare dui rutrum, condimentum justo.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-5 pt-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/men/32.jpg"
+                    alt="user"
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+
+                  <div>
+                    <h4 className="text-lg font-semibold">Evander Camilo</h4>
+                    <p className="mb-2 text-sm text-gray-500">IT-Executive</p>
+
+                    <p className="leading-relaxed text-gray-600">
+                      Mras enim urna, interdum nec porttitor vitae, sollicitudin eu
+                      eros. Praesent eget mollis nulla nonl donec sit amet neque auctor,
+                      ornare dui rutrum, condimentum justo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12 rounded bg-[#f3f3f3] p-6 md:p-10">
+                <h2 className="mb-8 text-2xl font-bold text-[#0f172a] md:text-3xl">
+                  Leave a Comment
+                </h2>
+
+                <form className="space-y-6">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      className="w-full rounded border border-gray-200 bg-white px-5 py-4 outline-none focus:border-red-500"
+                    />
+
+                    <input
+                      type="email"
+                      placeholder="Your Email Address"
+                      className="w-full rounded border border-gray-200 bg-white px-5 py-4 outline-none focus:border-red-500"
+                    />
+                  </div>
+
+                  <textarea
+                    rows="6"
+                    placeholder="Enter Message..."
+                    className="w-full resize-none rounded border border-gray-200 bg-white px-5 py-4 outline-none focus:border-red-500"
+                  ></textarea>
+
+                  <button
+                    type="submit"
+                    className="rounded bg-red-600 px-8 py-4 font-semibold tracking-wide text-white transition hover:bg-red-700"
+                  >
+                    SUBMIT MESSAGE
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="rounded bg-white p-5 shadow-sm">
+              <div className="flex">
+                <input
+                  type="text"
+                  placeholder="Search Here"
+                  className="w-full rounded-l bg-gray-100 px-4 py-3 outline-none"
+                />
+                <button className="flex items-center justify-center rounded-r bg-red-600 px-5 text-white">
+                  <FaSearch />
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded bg-white p-6 shadow-sm">
+              <h3 className="mb-4 border-l-4 border-red-600 pl-3 text-xl font-bold">
+                Category
+              </h3>
+
+              <div className="space-y-3">
+                {[
+                  'Financial Analysis',
+                  'Taxation Planning',
+                  'Investment Trading',
+                  'Wealth Marketing',
+                  'Planning Strategies',
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex cursor-pointer items-center justify-between rounded bg-gray-100 px-4 py-3 transition hover:bg-gray-200"
+                  >
+                    <span className="text-gray-700">{item}</span>
+                    <FaArrowRight className="text-red-600" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   )
 }

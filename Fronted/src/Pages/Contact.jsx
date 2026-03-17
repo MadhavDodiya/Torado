@@ -41,7 +41,7 @@ function Contact({ pageTitle = 'Contact' }) {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[#f5f5f5] px-4 py-20">
+      <section className="relative overflow-hidden px-4 py-20">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-[-200px] top-[50%] h-[500px] w-[500px] rounded-full border border-red-400 opacity-40"></div>
           <div className="absolute right-[-200px] top-[30%] h-[500px] w-[500px] rounded-full border border-red-400 opacity-40"></div>

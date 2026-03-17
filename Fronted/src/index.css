@@ -1,5 +1,38 @@
 @import "tailwindcss";
 
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+  text-decoration: none !important;
+  color: #000 !important;
+}
+
+.footer-root a,
+.footer-root a:hover,
+.footer-root a:focus,
+.footer-root a:active,
+.footer-root a:visited {
+  color: #fff !important;
+}
+
+.header-top-link,
+.header-top-link:hover,
+.header-top-link:focus,
+.header-top-link:active,
+.header-top-link:visited {
+  color: #fff !important;
+}
+
+.header-top-social,
+.header-top-social:hover,
+.header-top-social:focus,
+.header-top-social:active,
+.header-top-social:visited {
+  color: #fff !important;
+}
+
 .hero-section {
   background: #0f2746;
   overflow: hidden;

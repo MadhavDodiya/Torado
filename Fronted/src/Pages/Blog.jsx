@@ -89,7 +89,7 @@ function Blog({ pageTitle = 'Blog' }) {
         </div>
       </section>
 
-      <section className="bg-gray-100 py-20">
+      <section className=" py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-14">
             <p className="text-pink-600 font-semibold tracking-widest">

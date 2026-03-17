@@ -119,7 +119,7 @@ function Footer() {
         </div>
       </section>
 
-      <footer style={{ background: '#0d1e32', color: '#fff', paddingTop: '100px' }}>
+      <footer className="footer-root" style={{ background: '#0d1e32', color: '#fff', paddingTop: '100px' }}>
         <div className="container-xl px-4">
           <div
             className="row g-5 pb-5"

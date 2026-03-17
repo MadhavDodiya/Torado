@@ -90,33 +90,33 @@ export default function Header() {
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-6 text-sm">
             <span className="hidden items-center gap-2 md:inline-flex">
-              <FaMapMarkerAlt className="text-red-500" />
+              <FaMapMarkerAlt className="text-white" />
               838 Andy Street, Madison, NJ 08003
             </span>
             <span className="inline-flex items-center gap-2">
-              <FaEnvelope className="text-red-500" />
+              <FaEnvelope className="text-white" />
               hello@torado.com
             </span>
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
             <span className="flex items-center gap-3">
-              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Help</Link>
+              <Link to="/contact" onClick={closeMenus} className="header-top-link text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Help</Link>
               <span className="text-white/40">/</span>
             </span>
             <span className="flex items-center gap-3">
-              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Support</Link>
+              <Link to="/contact" onClick={closeMenus} className="header-top-link text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Support</Link>
               <span className="text-white/40">/</span>
             </span>
             <span className="flex items-center gap-3">
-              <Link to="/contact" onClick={closeMenus} className="text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Contact</Link>
+              <Link to="/contact" onClick={closeMenus} className="header-top-link text-sm text-white/85 no-underline transition-colors hover:text-white" style={linkResetStyle}>Contact</Link>
             </span>
 
-            <div className="ml-4 flex items-center gap-3 text-base text-white/60">
-              <Link to="/" onClick={closeMenus} aria-label="Facebook" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaFacebookF /></Link>
-              <Link to="/" onClick={closeMenus} aria-label="Twitter" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaTwitter /></Link>
-              <Link to="/" onClick={closeMenus} aria-label="Instagram" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaInstagram /></Link>
-              <Link to="/" onClick={closeMenus} aria-label="LinkedIn" className="no-underline transition-colors hover:text-white" style={linkResetStyle}><FaLinkedinIn /></Link>
+            <div className="ml-4 flex items-center gap-3 text-base text-white">
+              <Link to="/" onClick={closeMenus} aria-label="Facebook" className="header-top-social no-underline transition-colors text-white" style={linkResetStyle}><FaFacebookF /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="Twitter" className="header-top-social no-underline transition-colors text-white" style={linkResetStyle}><FaTwitter /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="Instagram" className="header-top-social no-underline transition-colors text-white" style={linkResetStyle}><FaInstagram /></Link>
+              <Link to="/" onClick={closeMenus} aria-label="LinkedIn" className="header-top-social no-underline transition-colors text-white" style={linkResetStyle}><FaLinkedinIn /></Link>
             </div>
           </div>
         </div>
