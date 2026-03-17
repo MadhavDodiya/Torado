@@ -10,6 +10,8 @@ import Privacypolicy from './Pages/Privacypolicy'
 import TermAndCondition from './Pages/Term&condition'
 import Portfolio from './Pages/Portfolio'
 import Teams from './Pages/Teams'
+import Blog from './Pages/Blog'
+import BlogDetails from './Pages/BlogDetails'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 
@@ -29,6 +31,8 @@ function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/teams" element={<Teams pageTitle="Team" />} />
         <Route path="/team" element={<Teams pageTitle="Team" />} />
+        <Route path="/blog" element={<Blog pageTitle="Blog" />} />
+        <Route path="/blog-details" element={<BlogDetails pageTitle="Blog Details" />} />
         <Route path="/faqs" element={<Faqs pageTitle="Faq's" />} />
         <Route path="/testimonials" element={<Testimonials pageTitle="Testimonials" />} />
         <Route path="/privacy-policy" element={<Privacypolicy pageTitle="Privacy Policy" />} />

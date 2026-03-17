@@ -202,60 +202,46 @@ export default function Header({ currentPage }) {
             </li>
 
             {/* Team dropdown */}
-            <li
-              className="relative"
-              onMouseEnter={() => handleMouseEnter('team')}
-              onMouseLeave={handleMouseLeave}
-            >
+            <li className="relative" onMouseEnter={() => handleMouseEnter('team')} onMouseLeave={handleMouseLeave}>
               <div className="flex items-center gap-2">
-                <Link
-                  to="/teams"
-                  onClick={closeMenus}
-                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['team', 'teams', 'teamdetails']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
-                  style={linkResetStyle}
-                >
+                <Link to="/teams" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['team', 'teams', 'teamdetails']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
                   Team
                 </Link>
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('team') }}
-                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'team' ? 'rotate-180' : ''}`}
-                  aria-label="Toggle Team dropdown">
+                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('team') }} className={`text-sm opacity-70 transition-transform ${openDropdown === 'team' ? 'rotate-180' : ''}`} aria-label="Toggle Team dropdown">
                   <FaChevronDown />
                 </button>
               </div>
 
               {openDropdown === 'team' && (
-                <ul
-                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
-                  onMouseEnter={cancelCloseTimer}
-                  onMouseLeave={handleMouseLeave}>
+                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
                   <li><Link to="/teams" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teams']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team</Link></li>
                   <li><Link to="/teamdetails" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teamdetails']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team Details</Link></li>
                 </ul>
               )}
             </li>
 
-            {/* Blog */}
-            <li>
-              <Link
-                to="/blog"
-                onClick={closeMenus}
-                className={`text-lg font-semibold no-underline transition-colors ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
-                style={linkResetStyle}
-              >
-                Blog
-              </Link>
+            {/* Blog dropdown */}
+            <li className="relative" onMouseEnter={() => handleMouseEnter('blog')} onMouseLeave={handleMouseLeave}>
+              <div className="flex items-center gap-2">
+                <Link to="/blog" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['blog', 'blog-details']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                  Blog
+                </Link>
+                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('blog') }} className={`text-sm opacity-70 transition-transform ${openDropdown === 'blog' ? 'rotate-180' : ''}`} aria-label="Toggle Blog dropdown">
+                  <FaChevronDown />
+                </button>
+              </div>
+
+              {openDropdown === 'blog' && (
+                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
+                  <li><Link to="/blog" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Blog</Link></li>
+                  <li><Link to="/blog-details" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog-details']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Blog Details</Link></li>
+                </ul>
+              )}
             </li>
 
             {/* Contact */}
             <li>
-              <Link
-                to="/contact"
-                onClick={closeMenus}
-                className={`text-lg font-semibold no-underline transition-colors ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
-                style={linkResetStyle}
-              >
+              <Link to="/contact" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
                 Contact
               </Link>
             </li>
@@ -335,7 +321,20 @@ export default function Header({ currentPage }) {
                 )}
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/blog" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
+                <button
+                  type="button"
+                  onClick={() => toggleDropdown('blog-mobile')}
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-black"
+                >
+                  Blog
+                  <FaChevronDown className={`transition-transform ${openDropdown === 'blog-mobile' ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === 'blog-mobile' && (
+                  <div className="space-y-1 border-t border-slate-100 px-2 pb-2 pt-1">
+                    <Link to="/blog" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
+                    <Link to="/blog-details" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog-details']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog Details</Link>
+                  </div>
+                )}
               </li>
               <li className="rounded-lg border border-slate-100">
                 <Link to="/contact" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Contact</Link>
