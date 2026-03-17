@@ -7,16 +7,16 @@ import team2 from '../assets/Image/team2.jpg'
 import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
 
-function Teams({ pageTitle = 'Team' }) {
-  const members = [
-    { name: 'William Benjamin', role: 'Financial Advisor', img: team1 },
-    { name: 'Sophia Isabella', role: 'Financial Head', img: team2 },
-    { name: 'Michael Pluim', role: 'Head Office Manager', img: team3 },
-    { name: 'Charlotte Allen', role: 'Account Manager', img: team4 },
-    { name: 'Daniel Morgan', role: 'Investment Strategist', img: team1 },
-    { name: 'Emma Collins', role: 'Risk Consultant', img: team2 },
-  ]
+const members = [
+  { name: 'William Benjamin', role: 'Financial Advisor', img: team1 },
+  { name: 'Sophia Isabella', role: 'Financial Head', img: team2 },
+  { name: 'Michael Pluim', role: 'Head Office Manager', img: team3 },
+  { name: 'Charlotte Allen', role: 'Account Manager', img: team4 },
+  { name: 'Daniel Morgan', role: 'Investment Strategist', img: team1 },
+  { name: 'Emma Collins', role: 'Risk Consultant', img: team2 },
+]
 
+function Teams({ pageTitle = 'Team' }) {
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -67,33 +67,41 @@ function Teams({ pageTitle = 'Team' }) {
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
-              <article key={member.name} className="h-full rounded-lg bg-white p-6 shadow transition duration-300 hover:shadow-xl">
-                <div className="relative mb-6 overflow-hidden rounded-lg">
-                  <img src={member.img} alt={member.name} className="h-[260px] w-full object-cover" />
-                  <div
-                    className="absolute bottom-0 left-0 h-16 w-full bg-white"
-                    style={{ clipPath: 'polygon(0 50%,100% 0,100% 100%,0 100%)' }}
-                  ></div>
-                </div>
+              <Link
+                key={member.name}
+                to="/teamdetails"
+                state={{ member }}
+                className="block text-black no-underline hover:text-black hover:no-underline focus:text-black focus:no-underline active:text-black active:no-underline visited:text-black"
+                style={{ textDecoration: 'none', color: 'black' }}
+              >
+                <article className="h-full rounded-lg bg-white p-6 shadow transition duration-300 hover:shadow-xl">
+                  <div className="relative mb-6 overflow-hidden rounded-lg">
+                    <img src={member.img} alt={member.name} className="h-[260px] w-full object-cover" />
+                    <div
+                      className="absolute bottom-0 left-0 h-16 w-full bg-white"
+                      style={{ clipPath: 'polygon(0 50%,100% 0,100% 100%,0 100%)' }}
+                    ></div>
+                  </div>
 
-                <h3 className="mb-1 text-lg font-semibold text-slate-900">{member.name}</h3>
-                <p className="mb-6 text-sm text-gray-500">{member.role}</p>
+                  <h3 className="mb-1 text-lg font-semibold text-slate-900">{member.name}</h3>
+                  <p className="mb-6 text-sm text-gray-500">{member.role}</p>
 
-                <div className="flex gap-4">
-                  <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
-                    <FaFacebookF />
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
+                      <FaFacebookF />
+                    </div>
+                    <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
+                      <FaTwitter />
+                    </div>
+                    <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
+                      <FaInstagram />
+                    </div>
+                    <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
+                      <FaLinkedinIn />
+                    </div>
                   </div>
-                  <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
-                    <FaTwitter />
-                  </div>
-                  <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
-                    <FaInstagram />
-                  </div>
-                  <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-red-500 hover:text-white">
-                    <FaLinkedinIn />
-                  </div>
-                </div>
-              </article>
+                </article>
+              </Link>
             ))}
           </div>
         </div>

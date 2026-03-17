@@ -7,15 +7,15 @@ import post2 from '../assets/Image/service2.jpg'
 const getPagePath = (pageId) => (pageId === 'home' ? '/' : `/${pageId}`)
 
 const footerLinkMap = {
-  'About Us': 'about',
-  'Our Team': 'team',
-  'Our Projects': 'projects',
+  'About Us': 'aboutus',
+  'Our Team': 'teams',
+  'Our Projects': 'portfolio',
   'Latest News': 'blog',
   'Contact Us': 'contact',
-  'Financial Advice': 'financial-analysis',
+  'Financial Advice': 'service-detail',
   'Planning Strategies': 'services',
-  'Taxation Planning': 'taxation-planning',
-  'Investment Trading': 'investment-trading',
+  'Taxation Planning': 'service-detail',
+  'Investment Trading': 'service-detail',
   'Wealth Marketing': 'services',
 }
 
@@ -51,13 +51,13 @@ function Footer() {
       image: post1,
       category: 'BUSINESS & FINANCE',
       title: 'How To Start Getting More Of a Return From Your Savings',
-      pageId: 'financial-analysis',
+      pageId: 'service-detail',
     },
     {
       image: post2,
       category: 'BUSINESS & FINANCE',
       title: 'Consulted Admitting Wooded Is Power Acuteness',
-      pageId: 'taxation-planning',
+      pageId: 'service-detail',
     },
   ]
 
@@ -103,7 +103,7 @@ function Footer() {
 
           <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
             <Link
-              to={getPagePath('about')}
+              to={getPagePath('aboutus')}
               className="btn text-white fw-bold text-uppercase px-4 py-3"
               style={{
                 background: '#0d1e32',
@@ -370,7 +370,7 @@ function Footer() {
               </Link>{' '}
               is Proudly Owned by{' '}
               <Link
-                to={getPagePath('about')}
+                to={getPagePath('aboutus')}
                 className="text-decoration-none fw-semibold"
                 style={{ color: '#e61b50' }}
               >
@@ -379,7 +379,7 @@ function Footer() {
             </p>
             <div className="d-flex align-items-center gap-3" style={{ fontSize: '0.875rem' }}>
               <Link
-                to={getPagePath('contact')}
+                to={getPagePath('term-condition')}
                 className="text-decoration-none"
                 style={{ color: '#64748b' }}
               >
@@ -387,7 +387,7 @@ function Footer() {
               </Link>
               <span style={{ color: '#334155' }}>|</span>
               <Link
-                to={getPagePath('contact')}
+                to={getPagePath('privacy-policy')}
                 className="text-decoration-none"
                 style={{ color: '#64748b' }}
               >

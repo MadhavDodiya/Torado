@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {
   FaBars,
   FaChevronDown,
@@ -17,7 +17,10 @@ import logo from '../assets/Image/imgi_1_logo.png'
 
 const linkResetStyle = { textDecoration: 'none' }
 
-export default function Header({ currentPage }) {
+export default function Header() {
+  const location = useLocation()
+  const currentPage = location.pathname.replace(/^\//, '').replace(/\/+$/, '') || 'home'
+
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(null)
   const navRef = useRef(null)
@@ -32,7 +35,11 @@ export default function Header({ currentPage }) {
     setOpenDropdown(null)
   }
 
-  const isActive = (paths) => paths.includes(currentPage)
+  const isActive = (paths) => {
+    return paths.some(
+      (p) => currentPage === p || currentPage.startsWith(p + '/')
+    )
+  }
 
   const toggleDropdown = (name) => {
     setOpenDropdown((prev) => (prev === name ? null : name))
@@ -78,15 +85,16 @@ export default function Header({ currentPage }) {
 
   return (
     <header className="w-full">
+      {/* Top Bar */}
       <div className="bg-[#0b2344] text-white">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-6 text-sm">
             <span className="hidden items-center gap-2 md:inline-flex">
-              <FaMapMarkerAlt className="text-[#f00455]" />
+              <FaMapMarkerAlt className="text-red-500" />
               838 Andy Street, Madison, NJ 08003
             </span>
             <span className="inline-flex items-center gap-2">
-              <FaEnvelope className="text-[#f00455]" />
+              <FaEnvelope className="text-red-500" />
               hello@torado.com
             </span>
           </div>
@@ -114,6 +122,7 @@ export default function Header({ currentPage }) {
         </div>
       </div>
 
+      {/* Main Nav */}
       <nav ref={navRef} className="border-b border-slate-100 bg-white shadow-sm">
         <div className="mx-auto flex h-[96px] max-w-[1400px] items-center px-4 lg:px-8">
           <Link to="/" onClick={closeMenus} className="shrink-0 no-underline" aria-label="Go to Home" style={linkResetStyle}>
@@ -127,7 +136,7 @@ export default function Header({ currentPage }) {
               <Link
                 to="/"
                 onClick={closeMenus}
-                className={`text-lg font-semibold no-underline transition-colors ${isActive(['home']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['home']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
                 style={linkResetStyle}
               >
                 Home
@@ -138,24 +147,39 @@ export default function Header({ currentPage }) {
             <li
               className="relative"
               onMouseEnter={() => handleMouseEnter('services')}
-              onMouseLeave={handleMouseLeave}>
+              onMouseLeave={handleMouseLeave}
+            >
               <div className="flex items-center gap-2">
-                <Link to="/services" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['services']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                <Link
+                  to="/services"
+                  onClick={closeMenus}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['services', 'service-detail', 'financial-analysis', 'taxation-planning', 'investment-trading']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
+                  style={linkResetStyle}
+                >
                   Services
                 </Link>
                 <button
                   type="button"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('services') }}
                   className={`text-sm opacity-70 transition-transform ${openDropdown === 'services' ? 'rotate-180' : ''}`}
-                  aria-label="Toggle Services dropdown">
+                  aria-label="Toggle Services dropdown"
+                >
                   <FaChevronDown />
                 </button>
               </div>
 
               {openDropdown === 'services' && (
-                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
-                  <li><Link to="/services" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['services']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Services</Link></li>
-                  <li><Link to="/service-detail" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['service-detail']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Service Detail</Link></li>
+                <ul
+                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
+                  onMouseEnter={cancelCloseTimer}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <li>
+                    <Link to="/services" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['services']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Services</Link>
+                  </li>
+                  <li>
+                    <Link to="/service-detail" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['service-detail', 'financial-analysis', 'taxation-planning', 'investment-trading']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Service Detail</Link>
+                  </li>
                 </ul>
               )}
             </li>
@@ -168,9 +192,9 @@ export default function Header({ currentPage }) {
             >
               <div className="flex items-center gap-2">
                 <Link
-                  to="/about"
+                  to="/aboutus"
                   onClick={closeMenus}
-                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['about', 'projects', 'contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['aboutus', 'pricingplan', 'faqs', 'testimonials', 'portfolio', 'projects', 'privacy-policy', 'term-condition', 'error']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
                   style={linkResetStyle}
                 >
                   Pages
@@ -179,7 +203,8 @@ export default function Header({ currentPage }) {
                   type="button"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('pages') }}
                   className={`text-sm opacity-70 transition-transform ${openDropdown === 'pages' ? 'rotate-180' : ''}`}
-                  aria-label="Toggle Pages dropdown">
+                  aria-label="Toggle Pages dropdown"
+                >
                   <FaChevronDown />
                 </button>
               </div>
@@ -188,60 +213,102 @@ export default function Header({ currentPage }) {
                 <ul
                   className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
                   onMouseEnter={cancelCloseTimer}
-                  onMouseLeave={handleMouseLeave}>
-                  <li><Link to="/aboutus" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['about']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>About Us</Link></li>
-                  <li><Link to="/pricingplan" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['pricing-plan']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Pricing Plan</Link></li>
-                  <li><Link to="/faqs" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['faqs']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Faq's</Link></li>
-                  <li><Link to="/testimonials" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['testimonials']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Testimonials</Link></li>
-                  <li><Link to="/portfolio" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['portfolio']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Portfolio</Link></li>
-                  <li><Link to="/privacy-policy" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['privacy-policy']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Privacy Policy</Link></li>
-                  <li><Link to="/term-condition" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['term-condition']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Term & Condition</Link></li>
-                  <li><Link to="/error" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['error']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Error</Link></li>
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <li><Link to="/aboutus" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['aboutus']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>About Us</Link></li>
+                  <li><Link to="/pricingplan" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['pricingplan']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Pricing Plan</Link></li>
+                  <li><Link to="/faqs" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['faqs']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Faq's</Link></li>
+                  <li><Link to="/testimonials" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['testimonials']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Testimonials</Link></li>
+                  <li><Link to="/portfolio" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['portfolio', 'projects']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Portfolio</Link></li>
+                  <li><Link to="/privacy-policy" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['privacy-policy']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Privacy Policy</Link></li>
+                  <li><Link to="/term-condition" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['term-condition']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Term & Condition</Link></li>
+                  <li><Link to="/error" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['error']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Error</Link></li>
                 </ul>
               )}
             </li>
 
             {/* Team dropdown */}
-            <li className="relative" onMouseEnter={() => handleMouseEnter('team')} onMouseLeave={handleMouseLeave}>
+            <li
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('team')}
+              onMouseLeave={handleMouseLeave}
+            >
               <div className="flex items-center gap-2">
-                <Link to="/teams" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['team', 'teams', 'teamdetails']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                <Link
+                  to="/teams"
+                  onClick={closeMenus}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['teams', 'teamdetails', 'team-detail']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
+                  style={linkResetStyle}
+                >
                   Team
                 </Link>
-                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('team') }} className={`text-sm opacity-70 transition-transform ${openDropdown === 'team' ? 'rotate-180' : ''}`} aria-label="Toggle Team dropdown">
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('team') }}
+                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'team' ? 'rotate-180' : ''}`}
+                  aria-label="Toggle Team dropdown"
+                >
                   <FaChevronDown />
                 </button>
               </div>
 
               {openDropdown === 'team' && (
-                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
-                  <li><Link to="/teams" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teams']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team</Link></li>
-                  <li><Link to="/teamdetails" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teamdetails']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Team Details</Link></li>
+                <ul
+                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
+                  onMouseEnter={cancelCloseTimer}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <li><Link to="/teams" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teams']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Team</Link></li>
+                  <li><Link to="/teamdetails" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['teamdetails', 'team-detail']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Team Details</Link></li>
                 </ul>
               )}
             </li>
 
             {/* Blog dropdown */}
-            <li className="relative" onMouseEnter={() => handleMouseEnter('blog')} onMouseLeave={handleMouseLeave}>
+            <li
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('blog')}
+              onMouseLeave={handleMouseLeave}
+            >
               <div className="flex items-center gap-2">
-                <Link to="/blog" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['blog', 'blog-details']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+                <Link
+                  to="/blog"
+                  onClick={closeMenus}
+                  className={`text-lg font-semibold no-underline transition-colors ${isActive(['blog', 'blog-details', 'blogdetails']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
+                  style={linkResetStyle}
+                >
                   Blog
                 </Link>
-                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('blog') }} className={`text-sm opacity-70 transition-transform ${openDropdown === 'blog' ? 'rotate-180' : ''}`} aria-label="Toggle Blog dropdown">
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown('blog') }}
+                  className={`text-sm opacity-70 transition-transform ${openDropdown === 'blog' ? 'rotate-180' : ''}`}
+                  aria-label="Toggle Blog dropdown"
+                >
                   <FaChevronDown />
                 </button>
               </div>
 
               {openDropdown === 'blog' && (
-                <ul className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl" onMouseEnter={cancelCloseTimer} onMouseLeave={handleMouseLeave}>
-                  <li><Link to="/blog" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Blog</Link></li>
-                  <li><Link to="/blog-details" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog-details']) ? 'bg-[#fff1f6] text-[#f00455]' : 'text-black hover:bg-slate-50 hover:text-[#f00455]'}`} style={linkResetStyle}>Blog Details</Link></li>
+                <ul
+                  className="absolute left-0 top-full z-30 mt-4 min-w-[240px] rounded-xl border border-slate-100 bg-white p-2 shadow-xl"
+                  onMouseEnter={cancelCloseTimer}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <li><Link to="/blog" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Blog</Link></li>
+                  <li><Link to="/blog-details" onClick={closeMenus} className={`block w-full rounded-lg px-4 py-3 text-left text-sm font-semibold no-underline transition-colors ${isActive(['blog-details', 'blogdetails']) ? 'bg-[#fff1f6] text-red-500' : 'text-black hover:bg-slate-50 hover:text-red-500'}`} style={linkResetStyle}>Blog Details</Link></li>
                 </ul>
               )}
             </li>
 
             {/* Contact */}
             <li>
-              <Link to="/contact" onClick={closeMenus} className={`text-lg font-semibold no-underline transition-colors ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black hover:text-[#f00455]'}`} style={linkResetStyle}>
+              <Link
+                to="/contact"
+                onClick={closeMenus}
+                className={`text-lg font-semibold no-underline transition-colors ${isActive(['contact']) ? 'text-red-500' : 'text-black hover:text-red-500'}`}
+                style={linkResetStyle}
+              >
                 Contact
               </Link>
             </li>
@@ -259,11 +326,16 @@ export default function Header({ currentPage }) {
               </div>
             </div>
 
-            <Link to="/blog" onClick={closeMenus} aria-label="Search" className="text-2xl text-black no-underline transition-colors hover:text-[#f00455]" style={linkResetStyle}>
+            <Link to="/blog" onClick={closeMenus} aria-label="Search" className="text-2xl text-black no-underline transition-colors hover:text-red-500" style={linkResetStyle}>
               <FaSearch />
             </Link>
 
-            <Link to="/contact" onClick={closeMenus} className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]" style={linkResetStyle}>
+            <Link
+              to="/contact"
+              onClick={closeMenus}
+              className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
+              style={linkResetStyle}
+            >
               BOOK A CONSULTATION
             </Link>
           </div>
@@ -284,25 +356,25 @@ export default function Header({ currentPage }) {
           <div className="border-t border-slate-100 px-4 pb-6 pt-4 lg:hidden">
             <ul className="space-y-2">
               <li className="rounded-lg border border-slate-100">
-                <Link to="/" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['home']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Home</Link>
+                <Link to="/" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['home']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Home</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/services" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['services']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Services</Link>
+                <Link to="/services" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['services', 'service-detail', 'financial-analysis', 'taxation-planning', 'investment-trading']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Services</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/financial-analysis" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['financial-analysis']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Financial Analysis</Link>
+                <Link to="/financial-analysis" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['financial-analysis']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Financial Analysis</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/taxation-planning" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['taxation-planning']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Taxation Planning</Link>
+                <Link to="/taxation-planning" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['taxation-planning']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Taxation Planning</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/investment-trading" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['investment-trading']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Investment Trading</Link>
+                <Link to="/investment-trading" onClick={closeMenus} className={`block px-4 py-3 text-sm no-underline ${isActive(['investment-trading']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Investment Trading</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/about" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['about']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>About Us</Link>
+                <Link to="/aboutus" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['aboutus']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>About Us</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/projects" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['projects']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Projects</Link>
+                <Link to="/projects" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['projects', 'portfolio']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Projects</Link>
               </li>
               <li className="rounded-lg border border-slate-100">
                 <button
@@ -315,8 +387,8 @@ export default function Header({ currentPage }) {
                 </button>
                 {openDropdown === 'team-mobile' && (
                   <div className="space-y-1 border-t border-slate-100 px-2 pb-2 pt-1">
-                    <Link to="/teams" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['teams']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team</Link>
-                    <Link to="/teamdetails" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['teamdetails']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Team Details</Link>
+                    <Link to="/teams" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['teams']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Team</Link>
+                    <Link to="/teamdetails" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['teamdetails', 'team-detail']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Team Details</Link>
                   </div>
                 )}
               </li>
@@ -331,17 +403,22 @@ export default function Header({ currentPage }) {
                 </button>
                 {openDropdown === 'blog-mobile' && (
                   <div className="space-y-1 border-t border-slate-100 px-2 pb-2 pt-1">
-                    <Link to="/blog" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
-                    <Link to="/blog-details" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog-details']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Blog Details</Link>
+                    <Link to="/blog" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Blog</Link>
+                    <Link to="/blog-details" onClick={closeMenus} className={`block rounded-md px-3 py-2 text-sm no-underline ${isActive(['blog-details', 'blogdetails']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Blog Details</Link>
                   </div>
                 )}
               </li>
               <li className="rounded-lg border border-slate-100">
-                <Link to="/contact" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['contact']) ? 'text-[#f00455]' : 'text-black'}`} style={linkResetStyle}>Contact</Link>
+                <Link to="/contact" onClick={closeMenus} className={`block px-4 py-3 text-sm font-semibold no-underline ${isActive(['contact']) ? 'text-red-500' : 'text-black'}`} style={linkResetStyle}>Contact</Link>
               </li>
             </ul>
 
-            <Link to="/contact" onClick={closeMenus} className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]" style={linkResetStyle}>
+            <Link
+              to="/contact"
+              onClick={closeMenus}
+              className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
+              style={linkResetStyle}
+            >
               BOOK A CONSULTATION
             </Link>
           </div>
