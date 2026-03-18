@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   FaBars,
   FaChevronDown,
@@ -14,12 +14,17 @@ import {
   FaTwitter,
 } from 'react-icons/fa'
 import logo from '../assets/Image/imgi_1_logo.png'
+import { clearAuth, getStoredUser, isLoggedIn } from '../utils/auth'
 
 const linkResetStyle = { textDecoration: 'none' }
 
 export default function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const currentPage = location.pathname.replace(/^\//, '').replace(/\/+$/, '') || 'home'
+  const loggedIn = isLoggedIn()
+  const user = getStoredUser()
+  const isAdmin = Boolean(user?.isAdmin)
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(null)
@@ -33,6 +38,12 @@ export default function Header() {
     }
     setMobileOpen(false)
     setOpenDropdown(null)
+  }
+
+  const handleLogout = () => {
+    clearAuth()
+    closeMenus()
+    navigate('/login')
   }
 
   const isActive = (paths) => {
@@ -129,7 +140,7 @@ export default function Header() {
             <img src={logo} alt="Torado logo" className="h-12 w-auto" />
           </Link>
 
-          <ul className="ml-10 hidden items-center gap-8 lg:flex">
+          <ul className="ml-10 hidden items-center gap-4 lg:flex">
 
             {/* Home */}
             <li>
@@ -315,7 +326,7 @@ export default function Header() {
           </ul>
 
           {/* Desktop right */}
-          <div className="ml-auto hidden items-center gap-5 lg:flex">
+          <div className="ml-auto hidden items-center gap-4 lg:flex">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f00455] text-base text-white">
                 <FaPhoneAlt />
@@ -330,14 +341,36 @@ export default function Header() {
               <FaSearch />
             </Link>
 
-            <Link
-              to="/contact"
-              onClick={closeMenus}
-              className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
-              style={linkResetStyle}
-            >
-              BOOK A CONSULTATION
-            </Link>
+            {loggedIn ? (
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={closeMenus}
+                    className="inline-flex h-12 items-center rounded-md bg-[#0b2344] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#14345f]"
+                    style={linkResetStyle}
+                  >
+                    ADMIN PANEL
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#d30049]"
+                >
+                  LOGOUT
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMenus}
+                className="inline-flex h-12 items-center rounded-md bg-[#f00455] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
+                style={linkResetStyle}
+              >
+                BOOK A CONSULTATION
+              </Link>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -413,14 +446,36 @@ export default function Header() {
               </li>
             </ul>
 
-            <Link
-              to="/contact"
-              onClick={closeMenus}
-              className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
-              style={linkResetStyle}
-            >
-              BOOK A CONSULTATION
-            </Link>
+            {loggedIn ? (
+              <div className={`mt-5 grid ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={closeMenus}
+                    className="rounded-md bg-[#0b2344] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#14345f]"
+                    style={linkResetStyle}
+                  >
+                    ADMIN PANEL
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#d30049]"
+                >
+                  LOGOUT
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMenus}
+                className="mt-5 block w-full rounded-md bg-[#f00455] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#d30049]"
+                style={linkResetStyle}
+              >
+                BOOK A CONSULTATION
+              </Link>
+            )}
           </div>
         )}
       </nav>

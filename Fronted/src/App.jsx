@@ -14,9 +14,15 @@ import TeamDetail from './Pages/TeamDetail'
 import Blog from './Pages/Blog'
 import BlogDetails from './Pages/BlogDetails'
 import Contact from './Pages/Contact'
+import Login from './Pages/Login'
+import Register from './Pages/Register'
+import Dashboard from './Pages/Dashboard'
+import AdminPanel from './Pages/AdminPanel'
 import ErrorPage from './Pages/404Error'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
+import ProtectedRoute from './Components/ProtectedRoute'
+import AdminRoute from './Components/AdminRoute'
 
 function App() {
   const location = useLocation()
@@ -42,6 +48,14 @@ function App() {
         <Route path="/blog-details" element={<BlogDetails pageTitle="Blog Details" />} />
         <Route path="/blogdetails" element={<BlogDetails pageTitle="Blog Details" />} />
         <Route path="/contact" element={<Contact pageTitle="Contact" />} />
+        <Route path="/login" element={<Login pageTitle="Login" />} />
+        <Route path="/register" element={<Register pageTitle="Register" />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPanel />} />
+          </Route>
+        </Route>
         <Route path="/financial-analysis" element={<ServiceDetail pageTitle="Financial Analysis" />} />
         <Route path="/taxation-planning" element={<ServiceDetail pageTitle="Taxation Planning" />} />
         <Route path="/investment-trading" element={<ServiceDetail pageTitle="Investment Trading" />} />
