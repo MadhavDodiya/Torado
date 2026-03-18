@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Home from './Pages/Home'
 import Service from './Pages/Service'
 import ServiceDetail from './Pages/ServiceDetail'
@@ -19,15 +19,20 @@ import Register from './Pages/Register'
 import ErrorPage from './Pages/404Error'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
+import AdminLogin from './admin/pages/AdminLogin'
+import AdminRegister from './admin/pages/AdminRegister'
+import AdminDashboard from './admin/pages/AdminDashboard'
+import AdminProtectedRoute from './admin/components/AdminProtectedRoute'
 
 function App() {
   const location = useLocation()
   const normalizedPath = location.pathname.replace(/\/+$/, '')
   const currentPage = normalizedPath === '' || normalizedPath === '/' ? 'home' : normalizedPath.slice(1)
+  const isAdminPath = location.pathname.startsWith('/admin')
 
   return (
     <>
-      <Header currentPage={currentPage} />
+      {!isAdminPath ? <Header currentPage={currentPage} /> : null}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Service />} />
@@ -46,6 +51,12 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
+        <Route element={<AdminProtectedRoute />}>
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>
         <Route path="/financial-analysis" element={<ServiceDetail />} />
         <Route path="/taxation-planning" element={<ServiceDetail />} />
         <Route path="/investment-trading" element={<ServiceDetail />} />
@@ -56,7 +67,7 @@ function App() {
         <Route path="/term-condition" element={<TermAndCondition />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
-      <Footer />
+      {!isAdminPath ? <Footer /> : null}
     </>
   )
 }

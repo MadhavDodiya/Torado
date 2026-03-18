@@ -20,7 +20,7 @@ function Login() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      navigate('/')
+      navigate('/admin/dashboard')
     }
   }, [navigate])
 
@@ -51,7 +51,7 @@ function Login() {
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       setSuccess('Login successful. Redirecting...')
-      const redirectTo = location.state?.from || '/'
+      const redirectTo = location.state?.from || '/admin/dashboard'
 
       setTimeout(() => {
         navigate(redirectTo)

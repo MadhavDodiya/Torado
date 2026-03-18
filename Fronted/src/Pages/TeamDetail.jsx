@@ -9,6 +9,7 @@ import {
   FaLinkedinIn,
 } from 'react-icons/fa'
 import team2 from '../assets/Image/team2.jpg'
+import usePageContent from '../hooks/usePageContent'
 
 const skills = [
   { name: 'Tecnology', value: 90 },
@@ -16,7 +17,13 @@ const skills = [
   { name: 'Business', value: 75 },
 ]
 
+const defaultContent = {
+  pageTitle: 'Team Detail',
+}
+
 function TeamDetail() {
+  const content = usePageContent('team-detail', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   let location = useLocation()
   let selectedMember = location.state?.member ?? {
     name: 'Emma Charlotte',
@@ -26,6 +33,12 @@ function TeamDetail() {
 
   return (
     <>
+      <section className="bg-[#0d1e35] px-4 py-10">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="text-4xl font-extrabold text-white">{pageTitle}</h1>
+        </div>
+      </section>
+
       <section className="bg-[#f5f5f5] px-4 py-16">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="w-full">

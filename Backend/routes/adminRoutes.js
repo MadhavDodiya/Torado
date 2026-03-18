@@ -8,6 +8,12 @@ import {
   deleteUser,
   updateContactStatus,
 } from "../controllers/adminController.js";
+import {
+  getAdminContentList,
+  getAdminPageContent,
+  resetPageContent,
+  upsertPageContent,
+} from "../controllers/contentController.js";
 import { adminOnly } from "../middleware/adminMiddleware.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -21,5 +27,9 @@ router.get("/contacts", getAllContacts);
 router.patch("/contacts/:id/status", updateContactStatus);
 router.delete("/contacts/:id", deleteContact);
 router.delete("/users/:id", deleteUser);
+router.get("/content", getAdminContentList);
+router.get("/content/:slug", getAdminPageContent);
+router.put("/content/:slug", upsertPageContent);
+router.delete("/content/:slug", resetPageContent);
 
 export default router;

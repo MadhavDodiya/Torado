@@ -1,6 +1,14 @@
 const pageContent = {
   home: {
     pageTitle: "Home",
+    heroTagPrefix: "Get On The",
+    heroTagHighlight: "Right",
+    heroTagSuffix: "Way",
+    heroTitleLine1: "Financial Assistance",
+    heroTitleLine2: "With True Purpose",
+    heroDescription:
+      "Miena sipu del inora aid consectetur adipiscing elit. Ut elit tellus luctus nec ullamc orperrm nutka pulvinar dapibus leo della pierrano set amuse.",
+    heroButtonText: "HOW CAN WE HELP",
   },
   services: {
     pageTitle: "Our Services",

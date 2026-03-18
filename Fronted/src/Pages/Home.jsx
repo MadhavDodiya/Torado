@@ -33,6 +33,7 @@ import team1 from '../assets/Image/team1.jpg'
 import team2 from '../assets/Image/team2.jpg'
 import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
+import usePageContent from '../hooks/usePageContent'
 
 const getPagePath = (pageId) => (pageId === 'home' ? '/' : `/${pageId}`)
 
@@ -56,7 +57,19 @@ const getVisibleTeamMembers = () => {
     return 4
 }
 
+const defaultContent = {
+    heroTagPrefix: 'Get On The',
+    heroTagHighlight: 'Right',
+    heroTagSuffix: 'Way',
+    heroTitleLine1: 'Financial Assistance',
+    heroTitleLine2: 'With True Purpose',
+    heroDescription:
+        'Miena sipu del inora aid consectetur adipiscing elit. Ut elit tellus luctus nec ullamc orperrm nutka pulvinar dapibus leo della pierrano set amuse.',
+    heroButtonText: 'HOW CAN WE HELP',
+}
+
 function Home() {
+    const content = usePageContent('home', defaultContent)
     const services = useMemo(
         () => [
             { title: 'Financial Analysis', image: service1 },
@@ -462,18 +475,19 @@ function Home() {
                 <div className="hero-container">
                     <div className="hero-left">
                         <span className="hero-tag">
-                            Get On The <span className="highlight">Right</span> Way
+                            {content.heroTagPrefix || defaultContent.heroTagPrefix}{' '}
+                            <span className="highlight">{content.heroTagHighlight || defaultContent.heroTagHighlight}</span>{' '}
+                            {content.heroTagSuffix || defaultContent.heroTagSuffix}
                         </span>
                         <h1>
-                            Financial Assistance <br />
-                            With True Purpose
+                            {content.heroTitleLine1 || defaultContent.heroTitleLine1} <br />
+                            {content.heroTitleLine2 || defaultContent.heroTitleLine2}
                         </h1>
                         <p>
-                            Miena sipu del inora aid consectetur adipiscing elit. Ut elit tellus luctus nec ullamc
-                            orperrm nutka pulvinar dapibus leo della pierrano set amuse.
+                            {content.heroDescription || defaultContent.heroDescription}
                         </p>
                         <Link to={getPagePath('contact')} className="hero-btn">
-                            HOW CAN WE HELP
+                            {content.heroButtonText || defaultContent.heroButtonText}
                         </Link>
                     </div>
                     <div className="hero-right">
