@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { API_BASE_URL } from '../utils/api'
-import { getStoredUser } from '../utils/auth'
+import usePageContent from '../hooks/usePageContent'
 
-function Register({ pageTitle = 'Register' }) {
+const defaultContent = { pageTitle: 'Register' }
+
+function Register() {
+  const content = usePageContent('register', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
@@ -14,9 +18,8 @@ function Register({ pageTitle = 'Register' }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    const user = getStoredUser()
     if (token) {
-      navigate(user?.isAdmin ? '/admin' : '/dashboard')
+      navigate('/')
     }
   }, [navigate])
 

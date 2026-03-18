@@ -28,6 +28,12 @@ const contactSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    status: {
+      type: String,
+      enum: ["new", "in_progress", "resolved"],
+      default: "new",
+      trim: true,
+    },
   },
   { timestamps: true }
 );

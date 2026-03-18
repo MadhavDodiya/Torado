@@ -5,8 +5,13 @@ import img2 from '../assets/Image/team2.jpg'
 import img3 from '../assets/Image/team3.jpg'
 import { Link } from 'react-router-dom'
 import { FaQuoteLeft, FaStar } from 'react-icons/fa'
+import usePageContent from '../hooks/usePageContent'
 
-function Testimonials({ pageTitle = 'Testimonials' }) {
+const defaultContent = { pageTitle: 'Testimonials' }
+
+function Testimonials() {
+  const content = usePageContent('testimonials', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const testimonials = [
     {
       name: 'Aurel Beniamin',

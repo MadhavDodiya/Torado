@@ -1,8 +1,13 @@
 import React from 'react'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { Link } from 'react-router-dom'
+import usePageContent from '../hooks/usePageContent'
 
-function TermAndCondition({ pageTitle = 'Term & Condition' }) {
+const defaultContent = { pageTitle: 'Term & Condition' }
+
+function TermAndCondition() {
+  const content = usePageContent('term-condition', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const sections = [
     {
       id: 1,

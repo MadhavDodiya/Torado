@@ -4,8 +4,13 @@ import heroImg from '../assets/Image/service-bg.jpg'
 import blog1 from '../assets/Image/blog1.jpg'
 import blog2 from '../assets/Image/blog2.jpg'
 import blog3 from '../assets/Image/blog3.jpg'
+import usePageContent from '../hooks/usePageContent'
 
-function Blog({ pageTitle = 'Blog' }) {
+const defaultContent = { pageTitle: 'Blog' }
+
+function Blog() {
+  const content = usePageContent('blog', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const blogs = [
     {
       id: 1,

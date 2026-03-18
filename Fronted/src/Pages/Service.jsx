@@ -17,6 +17,7 @@ import service2 from '../assets/Image/service2.jpg'
 import service3 from '../assets/Image/service3.jpg'
 import service4 from '../assets/Image/service4.jpg'
 import service5 from '../assets/Image/service5.jpg'
+import usePageContent from '../hooks/usePageContent'
 
 const serviceGrowth = [
   {
@@ -81,7 +82,11 @@ const steps = [
   },
 ]
 
-function Service({ pageTitle = 'Our Services' }) {
+const defaultContent = { pageTitle: 'Our Services' }
+
+function Service() {
+  const content = usePageContent('services', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const navigate = useNavigate()
 
   return (

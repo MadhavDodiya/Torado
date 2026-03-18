@@ -1,8 +1,13 @@
 import React from 'react'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { Link } from 'react-router-dom'
+import usePageContent from '../hooks/usePageContent'
 
-function Privacypolicy({ pageTitle = 'Privacy Policy' }) {
+const defaultContent = { pageTitle: 'Privacy Policy' }
+
+function Privacypolicy() {
+  const content = usePageContent('privacy-policy', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const sections = [
     {
       id: 1,

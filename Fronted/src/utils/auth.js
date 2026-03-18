@@ -4,7 +4,7 @@ export const getStoredUser = () => {
 
   try {
     return JSON.parse(rawUser)
-  } catch (error) {
+  } catch {
     return null
   }
 }

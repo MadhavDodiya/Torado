@@ -1,8 +1,63 @@
-﻿import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
+import { API_BASE_URL } from '../utils/api'
+import usePageContent from '../hooks/usePageContent'
 
-function Contact({ pageTitle = 'Contact' }) {
+const defaultContent = { pageTitle: 'Contact' }
+
+function Contact() {
+  const content = usePageContent('contact', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    phone: '',
+    message: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit contact form')
+      }
+
+      setSuccess('Message sent successfully.')
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        phone: '',
+        message: '',
+      })
+    } catch (err) {
+      setError(err.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -57,24 +112,77 @@ function Contact({ pageTitle = 'Contact' }) {
             Technology Experts
           </h2>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid gap-6 md:grid-cols-2">
-              <input type="text" placeholder="Your Name" className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500" />
-              <input type="email" placeholder="Your Email Address" className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500" />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Your Name"
+                className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Your Email Address"
+                className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"
+                required
+              />
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <input type="text" placeholder="Your Subject" className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500" />
-              <input type="text" placeholder="Your Phone Number" className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500" />
+              <input
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="Your Subject"
+                className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Your Phone Number"
+                className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"
+              />
             </div>
 
-            <textarea rows="5" placeholder="Enter Your Message" className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"></textarea>
+            <textarea
+              rows="5"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              placeholder="Enter Your Message"
+              className="w-full rounded-md bg-gray-200 px-5 py-4 text-gray-700 outline-none focus:ring-2 focus:ring-red-500"
+              required
+            ></textarea>
+
+            {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+            {success ? <p className="text-sm font-medium text-green-600">{success}</p> : null}
 
             <div className="flex flex-wrap justify-center gap-4 pt-4">
-              <button type="submit" className="rounded-md bg-red-500 px-8 py-4 font-semibold text-white transition hover:bg-red-600">
-                SEND MESSAGE
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-md bg-red-500 px-8 py-4 font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? 'SENDING...' : 'SEND MESSAGE'}
               </button>
-              <button type="reset" className="rounded-md bg-red-500 px-8 py-4 font-semibold text-white transition hover:bg-red-600">
+              <button
+                type="reset"
+                onClick={() => {
+                  setFormData({ name: '', email: '', subject: '', phone: '', message: '' })
+                  setError('')
+                  setSuccess('')
+                }}
+                className="rounded-md bg-red-500 px-8 py-4 font-semibold text-white transition hover:bg-red-600"
+              >
                 RESET
               </button>
             </div>

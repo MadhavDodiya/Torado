@@ -7,8 +7,13 @@ import img4 from '../assets/Image/service4.jpg'
 import img5 from '../assets/Image/service5.jpg'
 import img6 from '../assets/Image/service6.jpg'
 import { FaArrowRight } from 'react-icons/fa'
+import usePageContent from '../hooks/usePageContent'
 
-function Portfolio({ pageTitle = 'Portfolio' }) {
+const defaultContent = { pageTitle: 'Portfolio' }
+
+function Portfolio() {
+  const content = usePageContent('portfolio', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const services = [
     {
       title: 'Business Tax Reforms',

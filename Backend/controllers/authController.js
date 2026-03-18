@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
-import isAdminEmail from "../utils/isAdminEmail.js";
 
 const normalizeEmail = (email = "") => email.trim().toLowerCase();
 
@@ -19,15 +18,17 @@ export const registerUser = async (req, res, next) => {
     ensureDBConnection(res);
 
     const { name, email, password } = req.body;
+    const normalizedName = typeof name === "string" ? name.trim() : "";
     const normalizedEmail = normalizeEmail(email);
+    const passwordValue = typeof password === "string" ? password : "";
 
-    if (!name || !normalizedEmail || !password) {
+    if (!normalizedName || !normalizedEmail || !passwordValue) {
       return res
         .status(400)
         .json({ message: "name, email and password are required" });
     }
 
-    if (password.length < 6) {
+    if (passwordValue.length < 6) {
       return res
         .status(400)
         .json({ message: "Password must be at least 6 characters long" });
@@ -38,10 +39,10 @@ export const registerUser = async (req, res, next) => {
       return res.status(409).json({ message: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(passwordValue, 10);
 
     const user = await User.create({
-      name: name.trim(),
+      name: normalizedName,
       email: normalizedEmail,
       password: hashedPassword,
     });
@@ -55,7 +56,7 @@ export const registerUser = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        isAdmin: isAdminEmail(user.email),
+        isAdmin: true,
       },
     });
   } catch (error) {
@@ -69,8 +70,9 @@ export const loginUser = async (req, res, next) => {
 
     const { email, password } = req.body;
     const normalizedEmail = normalizeEmail(email);
+    const passwordValue = typeof password === "string" ? password : "";
 
-    if (!normalizedEmail || !password) {
+    if (!normalizedEmail || !passwordValue) {
       return res.status(400).json({ message: "email and password are required" });
     }
 
@@ -79,7 +81,7 @@ export const loginUser = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(passwordValue, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -93,7 +95,7 @@ export const loginUser = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        isAdmin: isAdminEmail(user.email),
+        isAdmin: true,
       },
     });
   } catch (error) {

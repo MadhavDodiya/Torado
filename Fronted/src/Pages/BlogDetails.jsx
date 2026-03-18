@@ -9,8 +9,13 @@ import {
   FaLinkedinIn,
 } from 'react-icons/fa'
 import heroImg from '../assets/Image/service-bg.jpg'
+import usePageContent from '../hooks/usePageContent'
 
-function BlogDetails({ pageTitle = 'Blog Details' }) {
+const defaultContent = { pageTitle: 'Blog Details' }
+
+function BlogDetails() {
+  const content = usePageContent('blog-details', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   return (
     <>
       <section className="relative w-full overflow-hidden">

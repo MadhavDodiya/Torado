@@ -2,8 +2,13 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaCheckCircle } from 'react-icons/fa'
 import heroImg from '../assets/Image/service-bg.jpg'
+import usePageContent from '../hooks/usePageContent'
 
-function Pricingplans({ pageTitle = 'Pricing Plan' }) {
+const defaultContent = { pageTitle: 'Pricing Plan' }
+
+function Pricingplans() {
+  const content = usePageContent('pricingplan', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const plans = [
     {
       id: 'small',

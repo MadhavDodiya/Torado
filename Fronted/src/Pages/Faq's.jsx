@@ -2,8 +2,13 @@ import React, { useState } from 'react'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { Link } from 'react-router-dom'
 import { FiChevronDown } from 'react-icons/fi'
+import usePageContent from '../hooks/usePageContent'
 
-function Faqs({ pageTitle = 'Faq' }) {
+const defaultContent = { pageTitle: "Faq's" }
+
+function Faqs() {
+  const content = usePageContent('faqs', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const [active, setActive] = useState(0)
 
   const faqs = [

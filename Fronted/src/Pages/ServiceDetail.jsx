@@ -4,8 +4,13 @@ import { FiArrowRight, FiSearch } from 'react-icons/fi'
 import heroImg from '../assets/Image/service-bg.jpg'
 import service1 from '../assets/Image/imgi_19_service1.png'
 import service2 from '../assets/Image/service-details2.jpg'
+import usePageContent from '../hooks/usePageContent'
 
-function ServiceDetail({ pageTitle = 'Service Detail' }) {
+const defaultContent = { pageTitle: 'Service Detail' }
+
+function ServiceDetail() {
+  const content = usePageContent('service-detail', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
 
   const categories = [
     "Financial Analysis",

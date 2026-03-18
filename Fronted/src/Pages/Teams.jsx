@@ -6,6 +6,7 @@ import team1 from '../assets/Image/team1.jpg'
 import team2 from '../assets/Image/team2.jpg'
 import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
+import usePageContent from '../hooks/usePageContent'
 
 const members = [
   { name: 'William Benjamin', role: 'Financial Advisor', img: team1 },
@@ -16,7 +17,11 @@ const members = [
   { name: 'Emma Collins', role: 'Risk Consultant', img: team2 },
 ]
 
-function Teams({ pageTitle = 'Team' }) {
+const defaultContent = { pageTitle: 'Team' }
+
+function Teams() {
+  const content = usePageContent('teams', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   return (
     <>
       <section className="relative w-full overflow-hidden">

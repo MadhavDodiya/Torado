@@ -27,6 +27,7 @@ import team1 from '../assets/Image/team1.jpg'
 import team2 from '../assets/Image/team2.jpg'
 import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
+import usePageContent from '../hooks/usePageContent'
 
 const getVisibleSlides = () => {
     if (typeof window === 'undefined') return 3
@@ -48,7 +49,11 @@ const getVisibleTeamMembers = () => {
     return 4
 }
 
-function Aboutus({ pageTitle = 'About Us' }) {
+const defaultContent = { pageTitle: 'About Us' }
+
+function Aboutus() {
+    const content = usePageContent('aboutus', defaultContent)
+    const pageTitle = content.pageTitle || defaultContent.pageTitle
     const points = [
         'Expert consultants with proven delivery',
         'Transparent process and regular updates',

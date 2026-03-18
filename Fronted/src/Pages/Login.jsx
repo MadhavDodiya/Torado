@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { API_BASE_URL } from '../utils/api'
-import { getStoredUser } from '../utils/auth'
+import usePageContent from '../hooks/usePageContent'
 
-function Login({ pageTitle = 'Login' }) {
+const defaultContent = { pageTitle: 'Login' }
+
+function Login() {
+  const content = usePageContent('login', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
   const navigate = useNavigate()
   const location = useLocation()
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -15,9 +19,8 @@ function Login({ pageTitle = 'Login' }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    const user = getStoredUser()
     if (token) {
-      navigate(user?.isAdmin ? '/admin' : '/dashboard')
+      navigate('/')
     }
   }, [navigate])
 
@@ -48,7 +51,7 @@ function Login({ pageTitle = 'Login' }) {
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       setSuccess('Login successful. Redirecting...')
-      const redirectTo = location.state?.from || (data.user?.isAdmin ? '/admin' : '/dashboard')
+      const redirectTo = location.state?.from || '/'
 
       setTimeout(() => {
         navigate(redirectTo)

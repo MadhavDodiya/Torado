@@ -16,13 +16,9 @@ import BlogDetails from './Pages/BlogDetails'
 import Contact from './Pages/Contact'
 import Login from './Pages/Login'
 import Register from './Pages/Register'
-import Dashboard from './Pages/Dashboard'
-import AdminPanel from './Pages/AdminPanel'
 import ErrorPage from './Pages/404Error'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
-import ProtectedRoute from './Components/ProtectedRoute'
-import AdminRoute from './Components/AdminRoute'
 
 function App() {
   const location = useLocation()
@@ -34,36 +30,30 @@ function App() {
       <Header currentPage={currentPage} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/services" element={<Service pageTitle="Our Services" />} />
-        <Route path="/service-detail" element={<ServiceDetail pageTitle="Service Detail" />} />
-        <Route path="/aboutus" element={<Aboutus pageTitle="About Us" />} />
+        <Route path="/services" element={<Service />} />
+        <Route path="/service-detail" element={<ServiceDetail />} />
+        <Route path="/aboutus" element={<Aboutus />} />
         <Route path="/pricingplan" element={<Pricingplans />} />
         <Route path="/projects" element={<Portfolio />} />
         <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/teams" element={<Teams pageTitle="Team" />} />
-        <Route path="/team" element={<Teams pageTitle="Team" />} />
+        <Route path="/teams" element={<Teams />} />
+        <Route path="/team" element={<Teams />} />
         <Route path="/teamdetails" element={<TeamDetail />} />
         <Route path="/team-detail" element={<TeamDetail />} />
-        <Route path="/blog" element={<Blog pageTitle="Blog" />} />
-        <Route path="/blog-details" element={<BlogDetails pageTitle="Blog Details" />} />
-        <Route path="/blogdetails" element={<BlogDetails pageTitle="Blog Details" />} />
-        <Route path="/contact" element={<Contact pageTitle="Contact" />} />
-        <Route path="/login" element={<Login pageTitle="Login" />} />
-        <Route path="/register" element={<Register pageTitle="Register" />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<AdminPanel />} />
-          </Route>
-        </Route>
-        <Route path="/financial-analysis" element={<ServiceDetail pageTitle="Financial Analysis" />} />
-        <Route path="/taxation-planning" element={<ServiceDetail pageTitle="Taxation Planning" />} />
-        <Route path="/investment-trading" element={<ServiceDetail pageTitle="Investment Trading" />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog-details" element={<BlogDetails />} />
+        <Route path="/blogdetails" element={<BlogDetails />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/financial-analysis" element={<ServiceDetail />} />
+        <Route path="/taxation-planning" element={<ServiceDetail />} />
+        <Route path="/investment-trading" element={<ServiceDetail />} />
         <Route path="/error" element={<ErrorPage />} />
-        <Route path="/faqs" element={<Faqs pageTitle="Faq's" />} />
-        <Route path="/testimonials" element={<Testimonials pageTitle="Testimonials" />} />
-        <Route path="/privacy-policy" element={<Privacypolicy pageTitle="Privacy Policy" />} />
-        <Route path="/term-condition" element={<TermAndCondition pageTitle="Term & Condition" />} />
+        <Route path="/faqs" element={<Faqs />} />
+        <Route path="/testimonials" element={<Testimonials />} />
+        <Route path="/privacy-policy" element={<Privacypolicy />} />
+        <Route path="/term-condition" element={<TermAndCondition />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer />
