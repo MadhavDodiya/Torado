@@ -342,7 +342,7 @@ export default function Header() {
             {loggedIn ? (
               <>
                 <Link
-                  to="/admin/dashboard"
+                  to="/admin"
                   onClick={closeMenus}
                   className="inline-flex h-12 items-center rounded-md bg-[#0b2344] px-7 text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#14345f]"
                   style={linkResetStyle}
@@ -445,7 +445,7 @@ export default function Header() {
             {loggedIn ? (
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Link
-                  to="/admin/dashboard"
+                  to="/admin"
                   onClick={closeMenus}
                   className="rounded-md bg-[#0b2344] px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white no-underline transition-colors hover:bg-[#14345f]"
                   style={linkResetStyle}

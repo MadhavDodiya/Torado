@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { API_BASE_URL } from '../../utils/api'
+import { clearAuth, isAdminUser, isLoggedIn } from '../../utils/auth'
 
 function AdminLogin() {
   const navigate = useNavigate()
@@ -9,14 +10,23 @@ function AdminLogin() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      navigate('/admin/dashboard')
+    if (isLoggedIn() && isAdminUser()) {
+      navigate('/admin', { replace: true })
+      return
+    }
+
+    if (isLoggedIn() && !isAdminUser()) {
+      clearAuth()
     }
   }, [navigate])
+
+  useEffect(() => {
+    if (location.state?.reason === 'access_denied') {
+      setError('Access denied. Only admin users are allowed.')
+    }
+  }, [location.state])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -26,11 +36,10 @@ function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setSuccess('')
     setLoading(true)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -43,10 +52,7 @@ function AdminLogin() {
 
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      setSuccess('Admin login successful. Redirecting...')
-      setTimeout(() => {
-        navigate(location.state?.from || '/admin/dashboard')
-      }, 500)
+      navigate(location.state?.from || '/admin', { replace: true })
     } catch (err) {
       setError(err.message || 'Something went wrong')
     } finally {
@@ -55,53 +61,45 @@ function AdminLogin() {
   }
 
   return (
-    <section className="min-h-screen bg-[#0d1e35] px-4 py-16">
-      <div className="mx-auto max-w-md rounded-2xl bg-white p-8 shadow-2xl">
-        <h1 className="mb-2 text-3xl font-extrabold text-[#0d1e35]">Admin Login</h1>
-        <p className="mb-6 text-sm text-slate-500">Access content management dashboard</p>
+    <section className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-16">
+      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+        <h1 className="mb-2 text-3xl font-extrabold text-white">Admin Login</h1>
+        <p className="mb-6 text-sm text-slate-400">Sign in to access admin panel</p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-slate-700">Email</label>
+            <label className="mb-1 block text-sm font-semibold text-slate-200">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#f00455]"
+              className="w-full rounded-md border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-slate-400"
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-slate-700">Password</label>
+            <label className="mb-1 block text-sm font-semibold text-slate-200">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#f00455]"
+              className="w-full rounded-md border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-slate-400"
               required
             />
           </div>
 
-          {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
-          {success ? <p className="text-sm font-medium text-green-600">{success}</p> : null}
+          {error ? <p className="text-sm font-medium text-red-400">{error}</p> : null}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-[#f00455] px-4 py-3 font-bold text-white hover:bg-[#d30049] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-md bg-white px-4 py-3 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? 'LOGGING IN...' : 'LOGIN'}
           </button>
         </form>
-
-        <p className="mt-5 text-sm text-slate-600">
-          Need an account?{' '}
-          <Link to="/admin/register" className="font-semibold text-[#f00455] no-underline">
-            Admin Register
-          </Link>
-        </p>
       </div>
     </section>
   )

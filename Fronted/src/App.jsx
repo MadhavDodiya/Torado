@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './Pages/Home'
 import Service from './Pages/Service'
 import ServiceDetail from './Pages/ServiceDetail'
@@ -20,9 +20,9 @@ import ErrorPage from './Pages/404Error'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 import AdminLogin from './admin/pages/AdminLogin'
-import AdminRegister from './admin/pages/AdminRegister'
 import AdminDashboard from './admin/pages/AdminDashboard'
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute'
+import AdminLayout from './admin/components/AdminLayout'
 
 function App() {
   const location = useLocation()
@@ -51,12 +51,14 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/register" element={<AdminRegister />} />
         <Route element={<AdminProtectedRoute />}>
-          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+          </Route>
         </Route>
+
         <Route path="/financial-analysis" element={<ServiceDetail />} />
         <Route path="/taxation-planning" element={<ServiceDetail />} />
         <Route path="/investment-trading" element={<ServiceDetail />} />

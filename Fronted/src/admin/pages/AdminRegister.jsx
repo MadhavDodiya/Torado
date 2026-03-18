@@ -13,7 +13,7 @@ function AdminRegister() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      navigate('/admin/dashboard')
+      navigate('/admin')
     }
   }, [navigate])
 

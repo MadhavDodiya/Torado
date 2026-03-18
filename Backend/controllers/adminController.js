@@ -17,6 +17,7 @@ export const getAdminStats = async (req, res, next) => {
   try {
     const [
       totalUsers,
+      totalAdmins,
       totalContacts,
       resolvedContacts,
       inProgressContacts,
@@ -24,17 +25,17 @@ export const getAdminStats = async (req, res, next) => {
       latestContacts,
     ] = await Promise.all([
       User.countDocuments(),
+      User.countDocuments({ isAdmin: true }),
       Contact.countDocuments(),
       Contact.countDocuments({ status: "resolved" }),
       Contact.countDocuments({ status: "in_progress" }),
-      User.find().sort({ createdAt: -1 }).limit(5).select("name email createdAt"),
+      User.find().sort({ createdAt: -1 }).limit(5).select("name email isAdmin createdAt"),
       Contact.find()
         .sort({ createdAt: -1 })
         .limit(5)
         .select("name email subject status createdAt"),
     ]);
 
-    const totalAdmins = totalUsers;
     const newContacts = totalContacts - resolvedContacts - inProgressContacts;
 
     return res.status(200).json({
@@ -76,19 +77,14 @@ export const getAllUsers = async (req, res, next) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .select("_id name email createdAt"),
+        .select("_id name email isAdmin createdAt"),
       User.countDocuments(mongoQuery),
     ]);
 
-    const formattedUsers = users.map((user) => ({
-      ...user.toObject(),
-      isAdmin: true,
-    }));
-
     const filteredByRole =
       roleFilter === "all"
-        ? formattedUsers
-        : formattedUsers.filter((user) =>
+        ? users
+        : users.filter((user) =>
             roleFilter === "admin" ? user.isAdmin : !user.isAdmin
           );
 

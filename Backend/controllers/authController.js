@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
+import isAdminEmail from "../utils/isAdminEmail.js";
 
 const normalizeEmail = (email = "") => email.trim().toLowerCase();
 
@@ -12,6 +13,17 @@ const ensureDBConnection = (res) => {
     throw new Error("Database is not connected. Please try again later.");
   }
 };
+
+const buildAuthResponse = (user, message) => ({
+  message,
+  token: generateToken(user._id),
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: Boolean(user.isAdmin),
+  },
+});
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -45,20 +57,10 @@ export const registerUser = async (req, res, next) => {
       name: normalizedName,
       email: normalizedEmail,
       password: hashedPassword,
+      isAdmin: isAdminEmail(normalizedEmail),
     });
 
-    const token = generateToken(user._id);
-
-    return res.status(201).json({
-      message: "Registration successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: true,
-      },
-    });
+    return res.status(201).json(buildAuthResponse(user, "Registration successful"));
   } catch (error) {
     return next(error);
   }
@@ -86,18 +88,39 @@ export const loginUser = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = generateToken(user._id);
+    return res.status(200).json(buildAuthResponse(user, "Login successful"));
+  } catch (error) {
+    return next(error);
+  }
+};
 
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: true,
-      },
-    });
+export const loginAdmin = async (req, res, next) => {
+  try {
+    ensureDBConnection(res);
+
+    const { email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
+    const passwordValue = typeof password === "string" ? password : "";
+
+    if (!normalizedEmail || !passwordValue) {
+      return res.status(400).json({ message: "email and password are required" });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(passwordValue, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    return res.status(200).json(buildAuthResponse(user, "Admin login successful"));
   } catch (error) {
     return next(error);
   }
