@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
-import { API_BASE_URL } from '../utils/api'
+import { buildApiUrl, getFriendlyApiError } from '../utils/api'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Contact' }
@@ -32,7 +32,7 @@ function Contact() {
     setSuccess('')
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/contact`, {
+      const response = await fetch(buildApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -52,7 +52,7 @@ function Contact() {
         message: '',
       })
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(getFriendlyApiError(err, 'Failed to submit contact form'))
     } finally {
       setLoading(false)
     }

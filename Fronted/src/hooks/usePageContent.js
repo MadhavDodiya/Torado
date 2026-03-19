@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { API_BASE_URL } from '../utils/api'
+import { buildApiUrl } from '../utils/api'
 
 const contentCache = new Map()
 
@@ -16,7 +16,7 @@ function usePageContent(slug, fallback = {}) {
 
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/content/${normalizedSlug}`)
+        const response = await fetch(buildApiUrl(`/api/content/${normalizedSlug}`))
         const data = await response.json().catch(() => ({}))
 
         if (!response.ok || !data?.data) {

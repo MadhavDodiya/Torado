@@ -34,6 +34,15 @@ const pageContent = {
   "term-condition": {
     pageTitle: "Term & Condition",
   },
+  error: {
+    pageTitle: "Error Page",
+    statusCode: "404",
+    heading: "Page Not Found",
+    description:
+      "The page you are looking for does not exist or may have been moved. Please return to the homepage or go back to the previous page.",
+    primaryButtonText: "Go Home",
+    secondaryButtonText: "Go Back",
+  },
   portfolio: {
     pageTitle: "Portfolio",
   },
@@ -57,6 +66,25 @@ const pageContent = {
   },
   register: {
     pageTitle: "Register",
+  },
+  "admin-login": {
+    pageTitle: "Admin Login",
+    subtitle: "Sign in to access admin panel",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    submitButtonText: "LOGIN",
+    registerPrompt: "Admin account nahi hai?",
+    registerLinkText: "Admin Register",
+  },
+  "admin-register": {
+    pageTitle: "Admin Register",
+    subtitle: "Create admin account for dashboard access",
+    nameLabel: "Full Name",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    submitButtonText: "REGISTER",
+    loginPrompt: "Already registered?",
+    loginLinkText: "Admin Login",
   },
 };
 

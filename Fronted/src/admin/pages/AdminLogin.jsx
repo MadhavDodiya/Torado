@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-import { API_BASE_URL } from '../../utils/api'
+import usePageContent from '../../hooks/usePageContent'
+import { buildApiUrl, getFriendlyApiError } from '../../utils/api'
 import { clearAuth, isAdminUser, isLoggedIn } from '../../utils/auth'
+
+const defaultContent = {
+  pageTitle: 'Admin Login',
+  subtitle: 'Sign in to access admin panel',
+  emailLabel: 'Email',
+  passwordLabel: 'Password',
+  submitButtonText: 'LOGIN',
+  registerPrompt: 'Admin account nahi hai?',
+  registerLinkText: 'Admin Register',
+}
 
 function AdminLogin() {
   const navigate = useNavigate()
   const location = useLocation()
+  const content = usePageContent('admin-login', defaultContent)
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -39,7 +51,7 @@ function AdminLogin() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
+      const response = await fetch(buildApiUrl('/api/auth/admin/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -54,38 +66,49 @@ function AdminLogin() {
       localStorage.setItem('user', JSON.stringify(data.user))
       navigate(location.state?.from || '/admin', { replace: true })
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(getFriendlyApiError(err, 'Admin login failed'))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
-        <h1 className="mb-2 text-3xl font-extrabold text-white">Admin Login</h1>
-        <p className="mb-6 text-sm text-slate-400">Sign in to access admin panel</p>
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,_#1e293b,_#0f172a_45%,_#020617_90%)] px-4 py-16">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-28 top-10 h-72 w-72 rounded-full bg-rose-500/20 blur-3xl"></div>
+        <div className="absolute -right-24 bottom-8 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-8 shadow-2xl backdrop-blur-lg">
+        <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-white">
+          {content.pageTitle || defaultContent.pageTitle}
+        </h1>
+        <p className="mb-6 text-sm text-slate-300">{content.subtitle || defaultContent.subtitle}</p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-slate-200">Email</label>
+            <label className="mb-1 block text-sm font-semibold text-slate-200">
+              {content.emailLabel || defaultContent.emailLabel}
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full rounded-md border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-white/20 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-slate-200 focus:ring-2 focus:ring-slate-300/30"
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-slate-200">Password</label>
+            <label className="mb-1 block text-sm font-semibold text-slate-200">
+              {content.passwordLabel || defaultContent.passwordLabel}
+            </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full rounded-md border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-white/20 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-slate-200 focus:ring-2 focus:ring-slate-300/30"
               required
             />
           </div>
@@ -95,11 +118,18 @@ function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-white px-4 py-3 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-xl bg-white px-4 py-3 font-bold text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? 'LOGGING IN...' : 'LOGIN'}
+            {loading ? 'LOGGING IN...' : content.submitButtonText || defaultContent.submitButtonText}
           </button>
         </form>
+
+        <p className="mt-5 text-sm text-slate-300">
+          {content.registerPrompt || defaultContent.registerPrompt}{' '}
+          <Link to="/admin/register" className="font-semibold text-rose-200 no-underline hover:text-white">
+            {content.registerLinkText || defaultContent.registerLinkText}
+          </Link>
+        </p>
       </div>
     </section>
   )

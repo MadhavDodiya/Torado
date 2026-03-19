@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
-import { API_BASE_URL } from '../utils/api'
+import { buildApiUrl, getFriendlyApiError } from '../utils/api'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Register' }
@@ -35,7 +35,7 @@ function Register() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch(buildApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -53,7 +53,7 @@ function Register() {
         navigate('/login')
       }, 700)
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(getFriendlyApiError(err, 'Registration failed'))
     } finally {
       setLoading(false)
     }

@@ -7,6 +7,7 @@ import {
   getAllUsers,
   deleteUser,
   updateContactStatus,
+  uploadAdminImage,
 } from "../controllers/adminController.js";
 import {
   getAdminContentList,
@@ -27,6 +28,7 @@ router.get("/contacts", getAllContacts);
 router.patch("/contacts/:id/status", updateContactStatus);
 router.delete("/contacts/:id", deleteContact);
 router.delete("/users/:id", deleteUser);
+router.post("/upload-image", uploadAdminImage);
 router.get("/content", getAdminContentList);
 router.get("/content/:slug", getAdminPageContent);
 router.put("/content/:slug", upsertPageContent);

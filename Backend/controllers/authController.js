@@ -66,6 +66,74 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
+export const registerAdmin = async (req, res, next) => {
+  try {
+    ensureDBConnection(res);
+
+    const { name, email, password } = req.body;
+    const normalizedName = typeof name === "string" ? name.trim() : "";
+    const normalizedEmail = normalizeEmail(email);
+    const passwordValue = typeof password === "string" ? password : "";
+
+    if (!normalizedName || !normalizedEmail || !passwordValue) {
+      return res
+        .status(400)
+        .json({ message: "name, email and password are required" });
+    }
+
+    if (passwordValue.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
+    }
+
+    const hasAdminAllowList = Boolean((process.env.ADMIN_EMAILS || "").trim());
+    const isProduction = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
+    if (isProduction && hasAdminAllowList && !isAdminEmail(normalizedEmail)) {
+      return res.status(403).json({
+        message:
+          "This email is not allowed for admin registration. Ask backend admin to update ADMIN_EMAILS.",
+      });
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
+
+    if (existingUser) {
+      const isMatch = await bcrypt.compare(passwordValue, existingUser.password);
+      if (!isMatch) {
+        return res.status(409).json({
+          message:
+            "User already exists with this email. Use same password for admin upgrade or login.",
+        });
+      }
+
+      if (!existingUser.isAdmin) {
+        existingUser.isAdmin = true;
+        await existingUser.save();
+      }
+
+      return res
+        .status(200)
+        .json(buildAuthResponse(existingUser, "Admin account is ready"));
+    }
+
+    const hashedPassword = await bcrypt.hash(passwordValue, 10);
+
+    const adminUser = await User.create({
+      name: normalizedName,
+      email: normalizedEmail,
+      password: hashedPassword,
+      isAdmin: true,
+    });
+
+    return res
+      .status(201)
+      .json(buildAuthResponse(adminUser, "Admin registration successful"));
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const loginUser = async (req, res, next) => {
   try {
     ensureDBConnection(res);

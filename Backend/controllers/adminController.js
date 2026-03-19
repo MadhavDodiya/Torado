@@ -1,8 +1,23 @@
 import Contact from "../models/Contact.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const CONTACT_STATUSES = ["new", "in_progress", "resolved"];
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+]);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const UPLOAD_DIRECTORY = path.resolve(__dirname, "../uploads/content");
 
 const parsePagination = (query = {}) => {
   const page = Math.max(Number.parseInt(query.page || "1", 10), 1);
@@ -217,6 +232,92 @@ export const deleteUser = async (req, res, next) => {
     }
 
     return res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const sanitizeBaseFileName = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const extensionFromMimeType = (mimeType = "") => {
+  switch (mimeType) {
+    case "image/jpeg":
+      return "jpg";
+    case "image/png":
+      return "png";
+    case "image/webp":
+      return "webp";
+    case "image/gif":
+      return "gif";
+    case "image/svg+xml":
+      return "svg";
+    default:
+      return "";
+  }
+};
+
+export const uploadAdminImage = async (req, res, next) => {
+  try {
+    const { fileName, mimeType, data } = req.body || {};
+    const normalizedMimeType = String(mimeType || "").trim().toLowerCase();
+
+    if (!ALLOWED_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
+      return res.status(400).json({
+        message: "Only image files are allowed (jpg, png, webp, gif, svg).",
+      });
+    }
+
+    const dataUrlPrefix = `data:${normalizedMimeType};base64,`;
+    const rawData = String(data || "");
+    const base64Payload = rawData.startsWith(dataUrlPrefix)
+      ? rawData.slice(dataUrlPrefix.length)
+      : rawData;
+
+    if (!base64Payload) {
+      return res.status(400).json({ message: "Image data is required." });
+    }
+
+    const buffer = Buffer.from(base64Payload, "base64");
+    if (!buffer.length) {
+      return res.status(400).json({ message: "Image data is invalid." });
+    }
+
+    if (buffer.length > MAX_IMAGE_SIZE_BYTES) {
+      return res
+        .status(400)
+        .json({ message: "Image size should be less than 10MB." });
+    }
+
+    const originalName = sanitizeBaseFileName(fileName || "image");
+    const ext = extensionFromMimeType(normalizedMimeType);
+    const baseName = originalName.replace(/\.[a-z0-9]+$/i, "") || "image";
+    const safeFileName = `${baseName}-${Date.now()}-${Math.round(
+      Math.random() * 1e6
+    )}.${ext}`;
+
+    await fs.mkdir(UPLOAD_DIRECTORY, { recursive: true });
+    const absolutePath = path.join(UPLOAD_DIRECTORY, safeFileName);
+    await fs.writeFile(absolutePath, buffer);
+
+    const relativeUrl = `/uploads/content/${safeFileName}`;
+    const fullUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
+
+    return res.status(201).json({
+      message: "Image uploaded successfully.",
+      data: {
+        fileName: safeFileName,
+        mimeType: normalizedMimeType,
+        size: buffer.length,
+        url: fullUrl,
+        relativeUrl,
+      },
+    });
   } catch (error) {
     return next(error);
   }

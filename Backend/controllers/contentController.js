@@ -5,6 +5,33 @@ import PageContent from "../models/PageContent.js";
 
 const normalizeSlug = (value = "") => String(value).trim().toLowerCase();
 
+const CONTENT_SLUG_ALIASES = {
+  service: "services",
+  "service-details": "service-detail",
+  servicetail: "service-detail",
+  "about-us": "aboutus",
+  "pricing-plan": "pricingplan",
+  faq: "faqs",
+  testimonial: "testimonials",
+  team: "teams",
+  teamdetails: "team-detail",
+  "team-details": "team-detail",
+  "blog-detail": "blog-details",
+  blogdetail: "blog-details",
+  adminlogin: "admin-login",
+  adminregister: "admin-register",
+  "privacy policy": "privacy-policy",
+  "terms-condition": "term-condition",
+  "terms-and-condition": "term-condition",
+  termcondition: "term-condition",
+  errorpage: "error",
+};
+
+const resolveContentSlug = (value = "") => {
+  const normalized = normalizeSlug(value);
+  return CONTENT_SLUG_ALIASES[normalized] || normalized;
+};
+
 const isPlainObject = (value) =>
   Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
@@ -56,7 +83,7 @@ export const getAllContent = async (req, res, next) => {
 
 export const getPageContent = async (req, res, next) => {
   try {
-    const slug = normalizeSlug(req.params.slug);
+    const slug = resolveContentSlug(req.params.slug);
     const defaultContent = defaultPageContent[slug];
 
     if (!defaultContent && mongoose.connection.readyState !== 1) {
@@ -95,6 +122,8 @@ export const getAdminContentList = async (req, res, next) => {
           defaultPageContent[slug] || {},
           storedMap[slug]?.content || {}
         ),
+        storedContent: storedMap[slug]?.content || {},
+        hasCustomContent: Boolean(storedMap[slug]),
         updatedAt: storedMap[slug]?.updatedAt || null,
       }));
 
@@ -106,7 +135,7 @@ export const getAdminContentList = async (req, res, next) => {
 
 export const getAdminPageContent = async (req, res, next) => {
   try {
-    const slug = normalizeSlug(req.params.slug);
+    const slug = resolveContentSlug(req.params.slug);
     const defaultContent = defaultPageContent[slug] || {};
     const storedDoc =
       mongoose.connection.readyState === 1
@@ -121,6 +150,8 @@ export const getAdminPageContent = async (req, res, next) => {
       data: {
         slug,
         content: mergeContent(defaultContent, storedDoc?.content || {}),
+        storedContent: storedDoc?.content || {},
+        hasCustomContent: Boolean(storedDoc?.content),
         updatedAt: storedDoc?.updatedAt || null,
       },
     });
@@ -135,7 +166,7 @@ export const upsertPageContent = async (req, res, next) => {
       return res.status(503).json({ message: "Database is not connected." });
     }
 
-    const slug = normalizeSlug(req.params.slug);
+    const slug = resolveContentSlug(req.params.slug);
     const { content } = req.body;
 
     if (!slug) {
@@ -159,6 +190,8 @@ export const upsertPageContent = async (req, res, next) => {
       data: {
         slug: saved.slug,
         content: mergeContent(defaultPageContent[slug] || {}, saved.content || {}),
+        storedContent: saved.content || {},
+        hasCustomContent: true,
         updatedAt: saved.updatedAt,
       },
     });
@@ -173,12 +206,17 @@ export const resetPageContent = async (req, res, next) => {
       return res.status(503).json({ message: "Database is not connected." });
     }
 
-    const slug = normalizeSlug(req.params.slug);
+    const slug = resolveContentSlug(req.params.slug);
     await PageContent.findOneAndDelete({ slug });
 
     return res.status(200).json({
       message: "Page content reset to default successfully.",
-      data: { slug, content: defaultPageContent[slug] || {} },
+      data: {
+        slug,
+        content: defaultPageContent[slug] || {},
+        storedContent: {},
+        hasCustomContent: false,
+      },
     });
   } catch (error) {
     return next(error);
