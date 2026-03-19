@@ -21,6 +21,73 @@ const pageContent = {
   },
   pricingplan: {
     pageTitle: "Pricing Plan",
+    heroWatermark: "Pricing",
+    sectionTag: "How We Charge",
+    sectionTitle: "Pricing Plans",
+    sectionDescription:
+      "Etiam euismod libero id neque facilisis elementum in eget ligula. Ut consequat varius blandit. Duis quis tortor quis lacus facilisis.",
+    billingMonthlyLabel: "Monthly",
+    billingYearlyLabel: "Yearly",
+    billingSaveBadge: "Save 2 Months",
+    includesLabel: "This Plan Includes Global Relations",
+    enterpriseText: "Need custom enterprise pricing?",
+    enterpriseCtaText: "Talk to our team",
+    plans: [
+      {
+        id: "small",
+        name: "Small Plan",
+        monthlyPrice: 149,
+        yearlyPrice: 1490,
+        description:
+          "Best for startup teams who need structured finance basics.",
+        cta: "Start Small Plan",
+        featured: false,
+        features: [
+          { text: "All Financial Tasks", active: true },
+          { text: "Economic Market Survey", active: true },
+          { text: "Sales Operations", active: false },
+          { text: "Auto Intelligence", active: false },
+          { text: "24/7 Support", active: false },
+          { text: "Technology Services", active: false },
+        ],
+      },
+      {
+        id: "smart",
+        name: "Smart Plan",
+        monthlyPrice: 249,
+        yearlyPrice: 2490,
+        description:
+          "For growing businesses that need full planning and execution.",
+        cta: "Start Smart Plan",
+        featured: true,
+        features: [
+          { text: "All Financial Tasks", active: true },
+          { text: "Economic Market Survey", active: true },
+          { text: "Sales Operations", active: true },
+          { text: "Auto Intelligence", active: true },
+          { text: "24/7 Support", active: false },
+          { text: "Technology Services", active: false },
+        ],
+      },
+      {
+        id: "super",
+        name: "Super Plan",
+        monthlyPrice: 349,
+        yearlyPrice: 3490,
+        description:
+          "Advanced package for high-scale operations and dedicated support.",
+        cta: "Start Super Plan",
+        featured: false,
+        features: [
+          { text: "All Financial Tasks", active: true },
+          { text: "Economic Market Survey", active: true },
+          { text: "Sales Operations", active: true },
+          { text: "Auto Intelligence", active: true },
+          { text: "24/7 Support", active: true },
+          { text: "Technology Services", active: true },
+        ],
+      },
+    ],
   },
   faqs: {
     pageTitle: "Faq's",

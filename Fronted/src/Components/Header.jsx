@@ -41,7 +41,7 @@ export default function Header() {
   const handleLogout = () => {
     clearAuth()
     closeMenus()
-    navigate('/admin/login')
+    navigate('/login')
   }
 
   const isActive = (paths) => {

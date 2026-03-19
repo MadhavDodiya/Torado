@@ -1,12 +1,37 @@
 import React, { useMemo, useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { clearAuth, getStoredUser } from '../../utils/auth'
 
+const SIDEBAR_PAGES = [
+  { slug: 'home', label: 'Home' },
+  { slug: 'services', label: 'Services' },
+  { slug: 'service-detail', label: 'Service Detail' },
+  { slug: 'aboutus', label: 'About Us' },
+  { slug: 'pricingplan', label: 'Pricing Plan' },
+  { slug: 'faqs', label: "Faq's" },
+  { slug: 'testimonials', label: 'Testimonials' },
+  { slug: 'portfolio', label: 'Portfolio' },
+  { slug: 'teams', label: 'Teams' },
+  { slug: 'team-detail', label: 'Team Detail' },
+  { slug: 'blog', label: 'Blog' },
+  { slug: 'blog-details', label: 'Blog Details' },
+  { slug: 'contact', label: 'Contact' },
+  { slug: 'login', label: 'Login' },
+  { slug: 'register', label: 'Register' },
+  { slug: 'privacy-policy', label: 'Privacy Policy' },
+  { slug: 'term-condition', label: 'Term & Condition' },
+  { slug: 'error', label: 'Error Page' },
+  { slug: 'admin-login', label: 'Admin Login' },
+  { slug: 'admin-register', label: 'Admin Register' },
+]
+
 function AdminLayout() {
+  const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const user = useMemo(() => getStoredUser(), [])
+  const selectedPage = useMemo(() => new URLSearchParams(location.search).get('page') || '', [location.search])
 
   const handleLogout = () => {
     clearAuth()
@@ -67,20 +92,32 @@ function AdminLayout() {
           </div>
 
           <nav className="space-y-2">
-            <NavLink
-              end
+            <Link
               to="/admin"
-              className={({ isActive }) =>
-                `block rounded-xl px-3 py-3 text-sm font-semibold no-underline transition ${
-                  isActive
-                    ? 'bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.25)]'
-                    : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                }`
-              }
               onClick={() => setSidebarOpen(false)}
+              className={`block rounded-xl px-3 py-3 text-sm font-semibold no-underline transition ${
+                !selectedPage
+                  ? 'bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.25)]'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+              }`}
             >
               Dashboard
-            </NavLink>
+            </Link>
+
+            {SIDEBAR_PAGES.map((page) => (
+              <Link
+                key={page.slug}
+                to={`/admin?page=${encodeURIComponent(page.slug)}`}
+                onClick={() => setSidebarOpen(false)}
+                className={`block rounded-xl px-3 py-2.5 text-sm font-medium no-underline transition ${
+                  selectedPage === page.slug
+                    ? 'bg-indigo-600 text-white shadow-[0_10px_24px_rgba(79,70,229,0.28)]'
+                    : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                {page.label}
+              </Link>
+            ))}
           </nav>
         </aside>
 

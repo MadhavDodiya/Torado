@@ -1,10 +1,149 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { buildApiUrl } from '../../utils/api'
 import { clearAuth } from '../../utils/auth'
 
 const EMPTY_ROW = { path: '', value: '' }
+
+const DEFAULT_PRICING_FORM = {
+  pageTitle: 'Pricing Plan',
+  heroWatermark: 'Pricing',
+  sectionTag: 'How We Charge',
+  sectionTitle: 'Pricing Plans',
+  sectionDescription:
+    'Etiam euismod libero id neque facilisis elementum in eget ligula. Ut consequat varius blandit. Duis quis tortor quis lacus facilisis.',
+  billingMonthlyLabel: 'Monthly',
+  billingYearlyLabel: 'Yearly',
+  billingSaveBadge: 'Save 2 Months',
+  includesLabel: 'This Plan Includes Global Relations',
+  enterpriseText: 'Need custom enterprise pricing?',
+  enterpriseCtaText: 'Talk to our team',
+  plans: [
+    {
+      id: 'small',
+      name: 'Small Plan',
+      monthlyPrice: 149,
+      yearlyPrice: 1490,
+      description: 'Best for startup teams who need structured finance basics.',
+      cta: 'Start Small Plan',
+      featured: false,
+      featuresText:
+        '+ All Financial Tasks\n+ Economic Market Survey\n- Sales Operations\n- Auto Intelligence\n- 24/7 Support\n- Technology Services',
+    },
+    {
+      id: 'smart',
+      name: 'Smart Plan',
+      monthlyPrice: 249,
+      yearlyPrice: 2490,
+      description: 'For growing businesses that need full planning and execution.',
+      cta: 'Start Smart Plan',
+      featured: true,
+      featuresText:
+        '+ All Financial Tasks\n+ Economic Market Survey\n+ Sales Operations\n+ Auto Intelligence\n- 24/7 Support\n- Technology Services',
+    },
+    {
+      id: 'super',
+      name: 'Super Plan',
+      monthlyPrice: 349,
+      yearlyPrice: 3490,
+      description: 'Advanced package for high-scale operations and dedicated support.',
+      cta: 'Start Super Plan',
+      featured: false,
+      featuresText:
+        '+ All Financial Tasks\n+ Economic Market Survey\n+ Sales Operations\n+ Auto Intelligence\n+ 24/7 Support\n+ Technology Services',
+    },
+  ],
+}
+
+const cloneDefaultPricingForm = () => ({
+  ...DEFAULT_PRICING_FORM,
+  plans: DEFAULT_PRICING_FORM.plans.map((plan) => ({ ...plan })),
+})
+
+const getFeatureTextFromArray = (features = []) =>
+  features
+    .map((feature) => `${feature?.active ? '+' : '-'} ${String(feature?.text || '').trim()}`.trim())
+    .filter(Boolean)
+    .join('\n')
+
+const normalizePricingForm = (content = {}) => {
+  const fallback = cloneDefaultPricingForm()
+  const incomingPlans = Array.isArray(content?.plans) ? content.plans : []
+
+  return {
+    pageTitle: String(content?.pageTitle || fallback.pageTitle),
+    heroWatermark: String(content?.heroWatermark || fallback.heroWatermark),
+    sectionTag: String(content?.sectionTag || fallback.sectionTag),
+    sectionTitle: String(content?.sectionTitle || fallback.sectionTitle),
+    sectionDescription: String(content?.sectionDescription || fallback.sectionDescription),
+    billingMonthlyLabel: String(content?.billingMonthlyLabel || fallback.billingMonthlyLabel),
+    billingYearlyLabel: String(content?.billingYearlyLabel || fallback.billingYearlyLabel),
+    billingSaveBadge: String(content?.billingSaveBadge || fallback.billingSaveBadge),
+    includesLabel: String(content?.includesLabel || fallback.includesLabel),
+    enterpriseText: String(content?.enterpriseText || fallback.enterpriseText),
+    enterpriseCtaText: String(content?.enterpriseCtaText || fallback.enterpriseCtaText),
+    plans: fallback.plans.map((defaultPlan, index) => {
+      const incomingPlan = incomingPlans[index] || {}
+      const monthlyPrice = Number(incomingPlan?.monthlyPrice ?? incomingPlan?.price ?? defaultPlan.monthlyPrice)
+      const yearlyPrice = Number(incomingPlan?.yearlyPrice ?? monthlyPrice * 10)
+      const incomingFeatures = Array.isArray(incomingPlan?.features) ? incomingPlan.features : []
+
+      return {
+        id: String(incomingPlan?.id || defaultPlan.id),
+        name: String(incomingPlan?.name || defaultPlan.name),
+        monthlyPrice: Number.isFinite(monthlyPrice) ? monthlyPrice : defaultPlan.monthlyPrice,
+        yearlyPrice: Number.isFinite(yearlyPrice) ? yearlyPrice : defaultPlan.yearlyPrice,
+        description: String(incomingPlan?.description || defaultPlan.description),
+        cta: String(incomingPlan?.cta || defaultPlan.cta),
+        featured: Boolean(incomingPlan?.featured ?? defaultPlan.featured),
+        featuresText: incomingFeatures.length
+          ? getFeatureTextFromArray(incomingFeatures)
+          : defaultPlan.featuresText,
+      }
+    }),
+  }
+}
+
+const parseFeaturesFromText = (value = '') =>
+  String(value || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const isActive = !line.startsWith('-')
+      const text = line.replace(/^[-+]\s*/, '').trim()
+      return text ? { text, active: isActive } : null
+    })
+    .filter(Boolean)
+
+const buildPricingContentFromForm = (form) => ({
+  pageTitle: String(form.pageTitle || '').trim(),
+  heroWatermark: String(form.heroWatermark || '').trim(),
+  sectionTag: String(form.sectionTag || '').trim(),
+  sectionTitle: String(form.sectionTitle || '').trim(),
+  sectionDescription: String(form.sectionDescription || '').trim(),
+  billingMonthlyLabel: String(form.billingMonthlyLabel || '').trim(),
+  billingYearlyLabel: String(form.billingYearlyLabel || '').trim(),
+  billingSaveBadge: String(form.billingSaveBadge || '').trim(),
+  includesLabel: String(form.includesLabel || '').trim(),
+  enterpriseText: String(form.enterpriseText || '').trim(),
+  enterpriseCtaText: String(form.enterpriseCtaText || '').trim(),
+  plans: (Array.isArray(form.plans) ? form.plans : []).map((plan, index) => {
+    const monthlyPrice = Number(plan.monthlyPrice)
+    const yearlyPrice = Number(plan.yearlyPrice)
+    return {
+      id: String(plan.id || `plan-${index + 1}`).trim(),
+      name: String(plan.name || '').trim(),
+      monthlyPrice: Number.isFinite(monthlyPrice) ? monthlyPrice : 0,
+      yearlyPrice: Number.isFinite(yearlyPrice) ? yearlyPrice : 0,
+      description: String(plan.description || '').trim(),
+      cta: String(plan.cta || '').trim(),
+      featured: Boolean(plan.featured),
+      features: parseFeaturesFromText(plan.featuresText),
+    }
+  }),
+})
 
 const isPlainObject = (value) =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -82,10 +221,11 @@ const buildObjectFromRows = (rows) => {
 
 function AdminDashboard() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [contentList, setContentList] = useState([])
-  const [listLoading, setListLoading] = useState(true)
-  const [listError, setListError] = useState('')
+  const [_listLoading, setListLoading] = useState(true)
+  const [_listError, setListError] = useState('')
 
   const [selectedSlug, setSelectedSlug] = useState('')
   const [selectedPage, setSelectedPage] = useState(null)
@@ -104,20 +244,18 @@ function AdminDashboard() {
   const [createMessage, setCreateMessage] = useState('')
 
   const [deleteFieldPath, setDeleteFieldPath] = useState('')
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('')
-  const [imageFieldPath, setImageFieldPath] = useState('')
-  const [imageUploadLoading, setImageUploadLoading] = useState(false)
-  const [imageUploadError, setImageUploadError] = useState('')
-  const [imageUploadMessage, setImageUploadMessage] = useState('')
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('')
   const [rowUploadLoadingKey, setRowUploadLoadingKey] = useState('')
   const [newRowUploadError, setNewRowUploadError] = useState('')
   const [newRowUploadMessage, setNewRowUploadMessage] = useState('')
   const [editorRowUploadError, setEditorRowUploadError] = useState('')
   const [editorRowUploadMessage, setEditorRowUploadMessage] = useState('')
+  const [pricingForm, setPricingForm] = useState(() => cloneDefaultPricingForm())
+  const [pricingSaveLoading, setPricingSaveLoading] = useState(false)
+  const [pricingSaveError, setPricingSaveError] = useState('')
+  const [pricingSaveMessage, setPricingSaveMessage] = useState('')
 
   const token = useMemo(() => localStorage.getItem('token') || '', [])
+  const sidebarSlug = useMemo(() => String(searchParams.get('page') || '').trim().toLowerCase(), [searchParams])
 
   const adminFetch = useCallback(
     async (path, options = {}) => {
@@ -149,13 +287,13 @@ function AdminDashboard() {
       const data = await adminFetch('/api/admin/content')
       const items = Array.isArray(data?.data) ? data.data : []
       setContentList(items)
-      if (!selectedSlug && items[0]?.slug) setSelectedSlug(items[0].slug)
+      if (!selectedSlug && !sidebarSlug && items[0]?.slug) setSelectedSlug(items[0].slug)
     } catch (error) {
       setListError(error.message || 'Unable to load page list.')
     } finally {
       setListLoading(false)
     }
-  }, [adminFetch, selectedSlug])
+  }, [adminFetch, selectedSlug, sidebarSlug])
 
   const loadPage = useCallback(
     async (slug) => {
@@ -187,12 +325,17 @@ function AdminDashboard() {
     if (selectedSlug) loadPage(selectedSlug)
   }, [loadPage, selectedSlug])
 
-  useEffect(
-    () => () => {
-      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
-    },
-    [imagePreviewUrl],
-  )
+  useEffect(() => {
+    if (!sidebarSlug) return
+    setSelectedSlug(sidebarSlug)
+  }, [sidebarSlug])
+
+  useEffect(() => {
+    if (selectedSlug !== 'pricingplan') return
+    setPricingForm(normalizePricingForm(selectedPage?.content || {}))
+    setPricingSaveError('')
+    setPricingSaveMessage('')
+  }, [selectedPage, selectedSlug])
 
   const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -289,7 +432,7 @@ function AdminDashboard() {
         body: JSON.stringify({ content }),
       })
       setCreateMessage('New page content save ho gaya.')
-      setSelectedSlug(slug)
+      handleSelectPage(slug)
       await loadContentList()
       await loadPage(slug)
     } catch (error) {
@@ -315,17 +458,6 @@ function AdminDashboard() {
     setEditorRows(filtered.length ? filtered : [{ ...EMPTY_ROW }])
     setDeleteFieldPath('')
     setEditorError('')
-  }
-
-  const handleImageSelect = (event) => {
-    const selected = event.target.files?.[0] || null
-    setImageUploadError('')
-    setImageUploadMessage('')
-    setUploadedImageUrl('')
-    setImageFile(selected)
-
-    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
-    setImagePreviewUrl(selected ? URL.createObjectURL(selected) : '')
   }
 
   const uploadImageAndReturnUrl = async (file) => {
@@ -393,67 +525,54 @@ function AdminDashboard() {
     }
   }
 
-  const handleUploadImage = async () => {
-    if (!imageFile) {
-      setImageUploadError('Please select an image first.')
-      return
-    }
+  const setPricingField = (key, value) => {
+    setPricingForm((prev) => ({ ...prev, [key]: value }))
+  }
 
-    setImageUploadLoading(true)
-    setImageUploadError('')
-    setImageUploadMessage('')
+  const setPricingPlanField = (index, key, value) => {
+    setPricingForm((prev) => ({
+      ...prev,
+      plans: prev.plans.map((plan, i) => (i === index ? { ...plan, [key]: value } : plan)),
+    }))
+  }
+
+  const handleSavePricingForm = async () => {
+    if (selectedSlug !== 'pricingplan') return
+
+    setPricingSaveLoading(true)
+    setPricingSaveError('')
+    setPricingSaveMessage('')
     try {
-      const url = await uploadImageAndReturnUrl(imageFile)
-      setUploadedImageUrl(url)
-      setImageUploadMessage('Image uploaded successfully.')
+      const content = buildPricingContentFromForm(pricingForm)
+      const data = await adminFetch('/api/admin/content/pricingplan', {
+        method: 'PUT',
+        body: JSON.stringify({ content }),
+      })
+
+      const pageData = data?.data || null
+      setSelectedPage(pageData)
+      const rows = flattenObject(pageData?.content || {})
+      setEditorRows(rows.length ? rows : [EMPTY_ROW])
+      setPricingSaveMessage('Pricing plan content saved successfully.')
+      await loadContentList()
     } catch (error) {
-      setImageUploadError(error.message || 'Image upload failed.')
+      setPricingSaveError(error.message || 'Pricing plan save failed.')
     } finally {
-      setImageUploadLoading(false)
+      setPricingSaveLoading(false)
     }
-  }
-
-  const handleCopyUploadedUrl = async () => {
-    if (!uploadedImageUrl) return
-    try {
-      await navigator.clipboard.writeText(uploadedImageUrl)
-      setImageUploadMessage('Image URL copied.')
-      setImageUploadError('')
-    } catch {
-      setImageUploadError('Unable to copy URL. Manual copy karo.')
-    }
-  }
-
-  const handleUseImageInEditor = () => {
-    const targetPath = imageFieldPath.trim()
-    if (!selectedSlug) {
-      setImageUploadError('Pehle page select karo.')
-      return
-    }
-    if (!uploadedImageUrl) {
-      setImageUploadError('Upload image first.')
-      return
-    }
-    if (!targetPath) {
-      setImageUploadError('Field path do. Example: hero.imageUrl')
-      return
-    }
-
-    setEditorRows((prev) => {
-      const index = prev.findIndex((row) => row.path.trim() === targetPath)
-      if (index >= 0) {
-        return prev.map((row, i) => (i === index ? { ...row, value: uploadedImageUrl } : row))
-      }
-      return [...prev, { path: targetPath, value: uploadedImageUrl }]
-    })
-
-    setImageUploadError('')
-    setImageUploadMessage(`URL "${targetPath}" field me add ho gaya.`)
   }
 
   const selectedPageTitle = selectedPage?.content?.pageTitle || selectedSlug || 'Select Page'
   const totalPages = contentList.length
   const customPages = contentList.filter((item) => item?.hasCustomContent).length
+
+  const handleSelectPage = (slug) => {
+    if (!slug) return
+    setSelectedSlug(slug)
+    const next = new URLSearchParams(searchParams)
+    next.set('page', slug)
+    setSearchParams(next)
+  }
 
   return (
     <section className="space-y-6">
@@ -550,125 +669,7 @@ function AdminDashboard() {
         </div>
       </article>
 
-      <article className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm sm:p-6">
-        <h2 className="text-lg font-bold text-slate-900">Upload Image</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Image upload karo aur selected page (<span className="font-semibold">{selectedSlug || 'none'}</span>) ke field me use karo.
-        </p>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-[300px_1fr]">
-          <div className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageSelect}
-              className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
-            />
-            {imagePreviewUrl ? (
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                <img src={imagePreviewUrl} alt="Selected preview" className="h-48 w-full object-cover" />
-              </div>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleUploadImage}
-              disabled={imageUploadLoading || !imageFile}
-              className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {imageUploadLoading ? 'UPLOADING...' : 'UPLOAD IMAGE'}
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            <input
-              type="text"
-              value={uploadedImageUrl}
-              readOnly
-              placeholder="Uploaded image URL"
-              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none"
-            />
-            <input
-              type="text"
-              value={imageFieldPath}
-              onChange={(e) => setImageFieldPath(e.target.value)}
-              placeholder="Field path (example: hero.imageUrl)"
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleCopyUploadedUrl}
-                disabled={!uploadedImageUrl}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                COPY URL
-              </button>
-              <button
-                type="button"
-                onClick={handleUseImageInEditor}
-                disabled={!uploadedImageUrl || !selectedSlug}
-                className="rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                USE IN EDITOR
-              </button>
-            </div>
-            {imageUploadError ? <p className="text-sm font-medium text-red-600">{imageUploadError}</p> : null}
-            {imageUploadMessage ? <p className="text-sm font-medium text-emerald-700">{imageUploadMessage}</p> : null}
-          </div>
-        </div>
-      </article>
-
-      <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-        <article className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm sm:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900">All Pages</h2>
-              <p className="mt-1 text-sm text-slate-600">Select page to edit details.</p>
-            </div>
-            <button
-              type="button"
-              onClick={loadContentList}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              REFRESH
-            </button>
-          </div>
-
-          {listLoading ? <p className="mt-4 text-sm text-slate-500">Loading pages...</p> : null}
-          {listError ? <p className="mt-4 text-sm font-medium text-red-600">{listError}</p> : null}
-
-          <div className="mt-4 max-h-[620px] space-y-2 overflow-auto pr-1">
-            {contentList.map((item) => {
-              const isActive = item.slug === selectedSlug
-              const title = item?.content?.pageTitle || item.slug
-              return (
-                <button
-                  key={item.slug}
-                  type="button"
-                  onClick={() => setSelectedSlug(item.slug)}
-                  className={`w-full rounded-xl border px-3 py-2.5 text-left transition ${
-                    isActive
-                      ? 'border-slate-900 bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.28)]'
-                      : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold">{title}</p>
-                    {item?.hasCustomContent ? (
-                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
-                        custom
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className={`mt-1 truncate font-mono text-[11px] ${isActive ? 'text-slate-200' : 'text-slate-500'}`}>
-                    {item.slug}
-                  </p>
-                </button>
-              )
-            })}
-          </div>
-        </article>
-
+      <div>
         <article className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -691,6 +692,181 @@ function AdminDashboard() {
 
           {pageLoading ? <p className="mt-4 text-sm text-slate-500">Loading page details...</p> : null}
           {pageError ? <p className="mt-4 text-sm font-medium text-red-600">{pageError}</p> : null}
+
+          {selectedSlug === 'pricingplan' ? (
+            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 sm:p-5">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-indigo-950">Pricing Plan Form</h3>
+                <button
+                  type="button"
+                  onClick={() => setPricingForm(normalizePricingForm(selectedPage?.content || {}))}
+                  className="rounded-lg border border-indigo-300 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50"
+                >
+                  RESET FORM
+                </button>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <input
+                  type="text"
+                  value={pricingForm.pageTitle}
+                  onChange={(e) => setPricingField('pageTitle', e.target.value)}
+                  placeholder="Page Title"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.heroWatermark}
+                  onChange={(e) => setPricingField('heroWatermark', e.target.value)}
+                  placeholder="Hero Watermark"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.sectionTag}
+                  onChange={(e) => setPricingField('sectionTag', e.target.value)}
+                  placeholder="Section Tag"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.sectionTitle}
+                  onChange={(e) => setPricingField('sectionTitle', e.target.value)}
+                  placeholder="Section Title"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <textarea
+                  value={pricingForm.sectionDescription}
+                  onChange={(e) => setPricingField('sectionDescription', e.target.value)}
+                  placeholder="Section Description"
+                  rows={3}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 md:col-span-2"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.billingMonthlyLabel}
+                  onChange={(e) => setPricingField('billingMonthlyLabel', e.target.value)}
+                  placeholder="Monthly Label"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.billingYearlyLabel}
+                  onChange={(e) => setPricingField('billingYearlyLabel', e.target.value)}
+                  placeholder="Yearly Label"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.billingSaveBadge}
+                  onChange={(e) => setPricingField('billingSaveBadge', e.target.value)}
+                  placeholder="Yearly Badge Text"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.includesLabel}
+                  onChange={(e) => setPricingField('includesLabel', e.target.value)}
+                  placeholder="Includes Label"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.enterpriseText}
+                  onChange={(e) => setPricingField('enterpriseText', e.target.value)}
+                  placeholder="Enterprise Text"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+                <input
+                  type="text"
+                  value={pricingForm.enterpriseCtaText}
+                  onChange={(e) => setPricingField('enterpriseCtaText', e.target.value)}
+                  placeholder="Enterprise CTA Text"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div className="mt-4 space-y-4">
+                {pricingForm.plans.map((plan, index) => (
+                  <div key={`pricing-form-plan-${index}`} className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="mb-3 text-sm font-bold text-slate-800">Plan {index + 1}</p>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <input
+                        type="text"
+                        value={plan.id}
+                        onChange={(e) => setPricingPlanField(index, 'id', e.target.value)}
+                        placeholder="Plan Id"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                      />
+                      <input
+                        type="text"
+                        value={plan.name}
+                        onChange={(e) => setPricingPlanField(index, 'name', e.target.value)}
+                        placeholder="Plan Name"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                      />
+                      <input
+                        type="number"
+                        value={plan.monthlyPrice}
+                        onChange={(e) => setPricingPlanField(index, 'monthlyPrice', e.target.value)}
+                        placeholder="Monthly Price"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                      />
+                      <input
+                        type="number"
+                        value={plan.yearlyPrice}
+                        onChange={(e) => setPricingPlanField(index, 'yearlyPrice', e.target.value)}
+                        placeholder="Yearly Price"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                      />
+                      <input
+                        type="text"
+                        value={plan.cta}
+                        onChange={(e) => setPricingPlanField(index, 'cta', e.target.value)}
+                        placeholder="Button Text"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                      />
+                      <label className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(plan.featured)}
+                          onChange={(e) => setPricingPlanField(index, 'featured', e.target.checked)}
+                        />
+                        Featured Plan
+                      </label>
+                      <textarea
+                        value={plan.description}
+                        onChange={(e) => setPricingPlanField(index, 'description', e.target.value)}
+                        placeholder="Plan Description"
+                        rows={2}
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 md:col-span-2"
+                      />
+                      <textarea
+                        value={plan.featuresText}
+                        onChange={(e) => setPricingPlanField(index, 'featuresText', e.target.value)}
+                        placeholder={'+ Feature one\n- Feature two'}
+                        rows={6}
+                        className="rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs outline-none focus:border-slate-500 md:col-span-2"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSavePricingForm}
+                  disabled={pricingSaveLoading}
+                  className="rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {pricingSaveLoading ? 'SAVING PRICING...' : 'SAVE PRICING FORM'}
+                </button>
+                {pricingSaveError ? <p className="text-sm font-medium text-red-600">{pricingSaveError}</p> : null}
+                {pricingSaveMessage ? <p className="text-sm font-medium text-emerald-700">{pricingSaveMessage}</p> : null}
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-4 space-y-2">
             {editorRows.map((row, index) => {

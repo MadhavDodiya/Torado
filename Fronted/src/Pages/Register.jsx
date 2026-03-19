@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { buildApiUrl, getFriendlyApiError } from '../utils/api'
+import { isAdminUser } from '../utils/auth'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Register' }
@@ -19,7 +20,7 @@ function Register() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      navigate('/admin')
+      navigate(isAdminUser() ? '/admin' : '/')
     }
   }, [navigate])
 
@@ -41,7 +42,7 @@ function Register() {
         body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed')
       }

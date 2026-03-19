@@ -4,18 +4,28 @@ import { FaCheckCircle } from 'react-icons/fa'
 import heroImg from '../assets/Image/service-bg.jpg'
 import usePageContent from '../hooks/usePageContent'
 
-const defaultContent = { pageTitle: 'Pricing Plan' }
-
-function Pricingplans() {
-  const content = usePageContent('pricingplan', defaultContent)
-  const pageTitle = content.pageTitle || defaultContent.pageTitle
-  const plans = [
+const defaultContent = {
+  pageTitle: 'Pricing Plan',
+  heroWatermark: 'Pricing',
+  sectionTag: 'How We Charge',
+  sectionTitle: 'Pricing Plans',
+  sectionDescription:
+    'Etiam euismod libero id neque facilisis elementum in eget ligula. Ut consequat varius blandit. Duis quis tortor quis lacus facilisis.',
+  billingMonthlyLabel: 'Monthly',
+  billingYearlyLabel: 'Yearly',
+  billingSaveBadge: 'Save 2 Months',
+  includesLabel: 'This Plan Includes Global Relations',
+  enterpriseText: 'Need custom enterprise pricing?',
+  enterpriseCtaText: 'Talk to our team',
+  plans: [
     {
       id: 'small',
       name: 'Small Plan',
-      price: 149,
+      monthlyPrice: 149,
+      yearlyPrice: 1490,
       description: 'Best for startup teams who need structured finance basics.',
       cta: 'Start Small Plan',
+      featured: false,
       features: [
         { text: 'All Financial Tasks', active: true },
         { text: 'Economic Market Survey', active: true },
@@ -28,7 +38,8 @@ function Pricingplans() {
     {
       id: 'smart',
       name: 'Smart Plan',
-      price: 249,
+      monthlyPrice: 249,
+      yearlyPrice: 2490,
       description: 'For growing businesses that need full planning and execution.',
       cta: 'Start Smart Plan',
       featured: true,
@@ -44,9 +55,11 @@ function Pricingplans() {
     {
       id: 'super',
       name: 'Super Plan',
-      price: 349,
+      monthlyPrice: 349,
+      yearlyPrice: 3490,
       description: 'Advanced package for high-scale operations and dedicated support.',
       cta: 'Start Super Plan',
+      featured: false,
       features: [
         { text: 'All Financial Tasks', active: true },
         { text: 'Economic Market Survey', active: true },
@@ -56,7 +69,13 @@ function Pricingplans() {
         { text: 'Technology Services', active: true },
       ],
     },
-  ]
+  ],
+}
+
+function Pricingplans() {
+  const content = usePageContent('pricingplan', defaultContent)
+  const pageTitle = content.pageTitle || defaultContent.pageTitle
+  const plans = Array.isArray(content.plans) && content.plans.length ? content.plans : defaultContent.plans
 
   const [billing, setBilling] = useState('monthly')
 
@@ -66,7 +85,7 @@ function Pricingplans() {
         <div className="grid min-h-[430px] lg:grid-cols-2">
           <div className="relative flex items-center overflow-hidden bg-[#0d1e35] px-10 py-20 lg:px-16">
             <span className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[6rem] font-black uppercase tracking-widest text-white/[0.06] lg:text-[8rem]">
-              Pricing
+              {content.heroWatermark || defaultContent.heroWatermark}
             </span>
 
             <div className="relative z-10">
@@ -107,14 +126,13 @@ function Pricingplans() {
           <div className="mb-14 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div className="max-w-xl">
               <p className="mb-2 text-sm font-semibold uppercase text-red-500">
-                How We Charge
+                {content.sectionTag || defaultContent.sectionTag}
               </p>
               <h2 className="mb-4 text-4xl font-bold text-[#0f1f3d] md:text-5xl">
-                Pricing Plans
+                {content.sectionTitle || defaultContent.sectionTitle}
               </h2>
               <p className="text-gray-600">
-                Etiam euismod libero id neque facilisis elementum in eget ligula.
-                Ut consequat varius blandit. Duis quis tortor quis lacus facilisis.
+                {content.sectionDescription || defaultContent.sectionDescription}
               </p>
             </div>
 
@@ -128,7 +146,7 @@ function Pricingplans() {
                       : 'text-gray-600 hover:text-[#0f1f3d]'
                     }`}
                 >
-                  Monthly
+                  {content.billingMonthlyLabel || defaultContent.billingMonthlyLabel}
                 </button>
 
                 <button
@@ -139,9 +157,9 @@ function Pricingplans() {
                       : 'text-gray-600 hover:text-[#0f1f3d]'
                     }`}
                 >
-                  Yearly
+                  {content.billingYearlyLabel || defaultContent.billingYearlyLabel}
                   <span className="ml-2 rounded-full bg-[#0f1f3d] px-2 py-0.5 text-[10px] font-bold text-white">
-                    Save 2 Months
+                    {content.billingSaveBadge || defaultContent.billingSaveBadge}
                   </span>
                 </button>
               </div>
@@ -149,9 +167,9 @@ function Pricingplans() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-            {plans.map((plan) => (
+            {plans.map((plan, index) => (
               <button
-                key={plan.id}
+                key={plan.id || `plan-${index}`}
                 type="button"
                 className={`relative overflow-hidden rounded-2xl border text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${plan.featured
                     ? 'border-[#e61b50] bg-[#0f1f3d] text-white'
@@ -174,7 +192,10 @@ function Pricingplans() {
 
                   <div className="mt-4 flex items-end gap-2">
                     <h3 className="text-5xl font-extrabold">
-                      ${billing === 'monthly' ? plan.price : plan.price * 10}
+                      $
+                      {billing === 'monthly'
+                        ? Number(plan.monthlyPrice ?? 0)
+                        : Number(plan.yearlyPrice ?? Number(plan.monthlyPrice ?? 0) * 10)}
                     </h3>
                     <span className={plan.featured ? 'text-white/70' : 'text-gray-500'}>
                       / {billing === 'monthly' ? 'month' : 'year'}
@@ -192,12 +213,12 @@ function Pricingplans() {
                       : 'border-slate-200 bg-slate-50 text-slate-500'
                     }`}
                 >
-                  This Plan Includes Global Relations
+                  {content.includesLabel || defaultContent.includesLabel}
                 </div>
 
                 <div className="space-y-3 px-8 py-6">
-                  {plan.features.map((feature) => (
-                    <div key={feature.text} className="flex items-center gap-3 text-sm">
+                  {(Array.isArray(plan.features) ? plan.features : []).map((feature, featureIndex) => (
+                    <div key={`${feature.text}-${featureIndex}`} className="flex items-center gap-3 text-sm">
                       <FaCheckCircle
                         className={
                           feature.active
@@ -238,9 +259,9 @@ function Pricingplans() {
           </div>
 
           <div className="mt-10 rounded-lg bg-[#0f1f3d] px-6 py-4 text-center text-white">
-            Need custom enterprise pricing?{' '}
+            {content.enterpriseText || defaultContent.enterpriseText}{' '}
             <Link to="/contact" className="font-bold text-[#ff8fb0] no-underline hover:text-white">
-              Talk to our team
+              {content.enterpriseCtaText || defaultContent.enterpriseCtaText}
             </Link>
           </div>
         </div>

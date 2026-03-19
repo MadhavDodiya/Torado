@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { buildApiUrl, getFriendlyApiError } from '../utils/api'
+import { isAdminUser } from '../utils/auth'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Login' }
@@ -20,7 +21,7 @@ function Login() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      navigate('/admin')
+      navigate(isAdminUser() ? '/admin' : '/')
     }
   }, [navigate])
 
@@ -42,7 +43,7 @@ function Login() {
         body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed')
@@ -51,7 +52,7 @@ function Login() {
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       setSuccess('Login successful. Redirecting...')
-      const redirectTo = location.state?.from || '/admin'
+      const redirectTo = location.state?.from || (data?.user?.isAdmin ? '/admin' : '/')
 
       setTimeout(() => {
         navigate(redirectTo)
