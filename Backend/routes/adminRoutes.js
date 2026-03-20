@@ -16,31 +16,37 @@ import {
 } from "../controllers/contentController.js";
 import { adminOnly } from "../middleware/adminMiddleware.js";
 import { protect } from "../middleware/authMiddleware.js";
-// Import new route modules
-import blogRoutes from "./blogRoutes.js";
-import teamRoutes from "./teamRoutes.js";
-import serviceRoutes from "./serviceRoutes.js";
+import adminBlogRoutes from "./adminBlogRoutes.js";
+import adminTeamRoutes from "./adminTeamRoutes.js";
+import adminServiceRoutes from "./adminServiceRoutes.js";
 
 const router = express.Router();
 
+// All routes under /api/admin are protected
 router.use(protect, adminOnly);
 
-// Existing routes
+// Stats & users
 router.get("/stats", getAdminStats);
 router.get("/users", getAllUsers);
+router.delete("/users/:id", deleteUser);
+
+// Contacts
 router.get("/contacts", getAllContacts);
 router.patch("/contacts/:id/status", updateContactStatus);
 router.delete("/contacts/:id", deleteContact);
-router.delete("/users/:id", deleteUser);
+
+// Image upload
 router.post("/upload-image", uploadAdminImage);
+
+// Content/CMS
 router.get("/content", getAdminContentList);
 router.get("/content/:slug", getAdminPageContent);
 router.put("/content/:slug", upsertPageContent);
 router.delete("/content/:slug", resetPageContent);
 
-// New routes for Blog, Team, Service
-router.use("/blogs", blogRoutes);
-router.use("/team", teamRoutes);
-router.use("/services", serviceRoutes);
+// Data management - sub-routers (already protected by router.use above)
+router.use("/blogs", adminBlogRoutes);
+router.use("/team", adminTeamRoutes);
+router.use("/services", adminServiceRoutes);
 
 export default router;

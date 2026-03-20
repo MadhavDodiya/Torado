@@ -150,3 +150,38 @@ export const deleteBlog = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const adminGetAllBlogs = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = parsePagination(req.query);
+    const searchQuery = (req.query.q || "").trim();
+    const statusFilter = (req.query.status || "").trim();
+
+    const mongoQuery = {};
+    if (searchQuery) {
+      mongoQuery.$or = [
+        { title: { $regex: searchQuery, $options: "i" } },
+        { content: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+    if (statusFilter && ["draft", "published"].includes(statusFilter)) {
+      mongoQuery.status = statusFilter;
+    }
+
+    const [blogs, total] = await Promise.all([
+      Blog.find(mongoQuery)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select("-__v"),
+      Blog.countDocuments(mongoQuery),
+    ]);
+
+    return res.status(200).json({
+      data: blogs,
+      pagination: { page, limit, total },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

@@ -85,18 +85,19 @@ function AdminBlogs() {
     if (!file) return
     setImageUploading(true)
     try {
-      const reader = new FileReader()
-      reader.onload = async () => {
-        const dataUrl = reader.result
-        const res = await adminFetch('/api/admin/upload-image', {
-          method: 'POST',
-          body: JSON.stringify({ fileName: file.name, mimeType: file.type, data: dataUrl }),
-        })
-        const url = res?.data?.url || ''
-        const relativeUrl = res?.data?.relativeUrl || ''
-        setForm((prev) => ({ ...prev, featuredImage: { url, relativeUrl } }))
-      }
-      reader.readAsDataURL(file)
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = () => reject(new Error('File read failed'))
+        reader.readAsDataURL(file)
+      })
+      const res = await adminFetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: JSON.stringify({ fileName: file.name, mimeType: file.type, data: dataUrl }),
+      })
+      const url = res?.data?.url || ''
+      const relativeUrl = res?.data?.relativeUrl || ''
+      setForm((prev) => ({ ...prev, featuredImage: { url, relativeUrl } }))
     } catch (err) {
       setFormError(err.message || 'Image upload failed.')
     } finally {

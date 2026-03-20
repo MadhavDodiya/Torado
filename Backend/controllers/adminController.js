@@ -221,7 +221,7 @@ export const deleteUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid user id." });
     }
 
-    if (req.user.id === id) {
+    if (req.user._id.toString() === id) {
       return res.status(400).json({ message: "You cannot delete yourself." });
     }
 

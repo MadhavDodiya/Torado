@@ -4,10 +4,10 @@ import Service from './Pages/Service'
 import ServiceDetail from './Pages/ServiceDetail'
 import Aboutus from './Pages/Aboutus'
 import Pricingplans from './Pages/Pricingplans'
-import Faqs from "./Pages/Faq's"
+import Faqs from './Pages/Faqs'
 import Testimonials from './Pages/Testimonials'
 import Privacypolicy from './Pages/Privacypolicy'
-import TermAndCondition from './Pages/Term&condition'
+import TermAndCondition from './Pages/TermAndCondition'
 import Portfolio from './Pages/Portfolio'
 import Teams from './Pages/Teams'
 import TeamDetail from './Pages/TeamDetail'
@@ -40,7 +40,6 @@ function App() {
     <>
       {!isAdminPath ? <Header currentPage={currentPage} /> : null}
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Service />} />
         <Route path="/service-detail" element={<ServiceDetail />} />
@@ -67,11 +66,9 @@ function App() {
         <Route path="/privacy-policy" element={<Privacypolicy />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
 
-        {/* Admin Auth Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
 
-        {/* Admin Protected Routes */}
         <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />

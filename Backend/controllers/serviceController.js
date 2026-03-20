@@ -135,7 +135,7 @@ export const updateService = async (req, res, next) => {
 
     if (title) service.title = title.trim();
     if (description) service.description = description.trim();
-    if (shortDescription !== undefined) service.shortDescription = shortDescription.trim();
+    if (shortDescription !== undefined) service.shortDescription = shortDescription?.trim() ?? "";
     if (category) service.category = category;
     if (price !== undefined) service.price = price;
     if (featuredImage) service.featuredImage = featuredImage;
