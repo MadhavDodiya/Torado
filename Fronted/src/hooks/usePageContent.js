@@ -5,10 +5,24 @@ const contentCache = new Map()
 
 function usePageContent(slug, fallback = {}) {
   const normalizedSlug = String(slug || '').trim().toLowerCase()
-  const [contentBySlug, setContentBySlug] = useState({})
+
+  const [contentBySlug, setContentBySlug] = useState(() => {
+    if (normalizedSlug && contentCache.has(normalizedSlug)) {
+      return { [normalizedSlug]: contentCache.get(normalizedSlug) }
+    }
+    return {}
+  })
 
   useEffect(() => {
-    if (!normalizedSlug || contentCache.has(normalizedSlug)) {
+    if (!normalizedSlug) return
+
+    // Cache hit: no state update needed if already seeded
+    if (contentCache.has(normalizedSlug)) {
+      const cached = contentCache.get(normalizedSlug)
+      setContentBySlug((prev) => {
+        if (prev[normalizedSlug]) return prev
+        return { ...prev, [normalizedSlug]: cached }
+      })
       return
     }
 
@@ -17,13 +31,15 @@ function usePageContent(slug, fallback = {}) {
     const fetchContent = async () => {
       try {
         const response = await fetch(buildApiUrl(`/api/content/${normalizedSlug}`))
-        const data = await response.json().catch(() => ({}))
 
-        if (!response.ok || !data?.data) {
-          return
-        }
+        if (!response.ok) return
+
+        const data = await response.json().catch(() => null)
+
+        if (!data?.data) return
 
         contentCache.set(normalizedSlug, data.data)
+
         if (active) {
           setContentBySlug((prev) => ({ ...prev, [normalizedSlug]: data.data }))
         }
@@ -40,7 +56,7 @@ function usePageContent(slug, fallback = {}) {
   }, [normalizedSlug])
 
   if (!normalizedSlug) return fallback
-  return contentBySlug[normalizedSlug] || contentCache.get(normalizedSlug) || fallback
+  return contentBySlug[normalizedSlug] ?? contentCache.get(normalizedSlug) ?? fallback
 }
 
 export default usePageContent

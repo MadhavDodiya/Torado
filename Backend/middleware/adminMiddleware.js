@@ -1,17 +1,14 @@
-// Updated admin middleware implementation
+// Admin-only middleware
+// Must be used AFTER the `protect` middleware, which populates req.user
 
-const jwt = require('jsonwebtoken');
+export const adminOnly = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authorized. Please log in." });
+  }
 
-module.exports = function(req, res, next) {
-    const token = req.cookies.token;
-    if (!token) {
-        return res.status(403).send('Access denied. No token provided.');
-    }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (ex) {
-        res.status(400).send('Invalid token.');
-    }
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ message: "Access denied. Admin only." });
+  }
+
+  return next();
 };

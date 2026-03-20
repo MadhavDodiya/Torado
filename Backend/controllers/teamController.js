@@ -110,8 +110,8 @@ export const updateTeamMember = async (req, res, next) => {
 
     if (name) member.name = name.trim();
     if (position) member.position = position.trim();
-    if (bio !== undefined) member.bio = bio.trim();
-    if (email !== undefined) member.email = email.trim();
+    if (bio !== undefined) member.bio = bio?.trim() ?? "";
+    if (email !== undefined) member.email = email?.trim() ?? "";
     if (department) member.department = department;
     if (socialLinks) member.socialLinks = socialLinks;
     if (profileImage) member.profileImage = profileImage;

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Blog from "../models/Blog.js";
 
 const parsePagination = (query = {}) => {
@@ -40,6 +41,10 @@ export const getAllBlogs = async (req, res, next) => {
 export const getBlogById = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid blog id" });
+    }
 
     const blog = await Blog.findById(id).select("-__v");
 
@@ -90,6 +95,10 @@ export const updateBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid blog id" });
+    }
+
     const updates = req.body;
     if (updates.title) updates.title = updates.title.trim();
     if (updates.content) updates.content = updates.content.trim();
@@ -125,6 +134,10 @@ export const updateBlog = async (req, res, next) => {
 export const deleteBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid blog id" });
+    }
 
     const blog = await Blog.findByIdAndDelete(id);
 

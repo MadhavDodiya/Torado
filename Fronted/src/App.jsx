@@ -4,10 +4,10 @@ import Service from './Pages/Service'
 import ServiceDetail from './Pages/ServiceDetail'
 import Aboutus from './Pages/Aboutus'
 import Pricingplans from './Pages/Pricingplans'
-import Faqs from './Pages/Faq\'s'
+import Faqs from './Pages/Faqs'
 import Testimonials from './Pages/Testimonials'
 import Privacypolicy from './Pages/Privacypolicy'
-import TermAndCondition from './Pages/Term&condition'
+import TermAndCondition from './Pages/TermAndCondition'
 import Portfolio from './Pages/Portfolio'
 import Teams from './Pages/Teams'
 import TeamDetail from './Pages/TeamDetail'
@@ -21,7 +21,11 @@ import Header from './Components/Header'
 import Footer from './Components/Footer'
 import AdminLogin from './admin/pages/AdminLogin'
 import AdminRegister from './admin/pages/AdminRegister'
-import AdminDashboard from './admin/pages/AdminDashboard'
+import AdminBlogs from './admin/pages/AdminBlogs'
+import AdminTeams from './admin/pages/AdminTeams'
+import AdminServices from './admin/pages/AdminServices'
+import AdminContacts from './admin/pages/AdminContacts'
+import AdminUsers from './admin/pages/AdminUsers'
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute'
 import AdminLayout from './admin/components/AdminLayout'
 
@@ -35,6 +39,7 @@ function App() {
     <>
       {!isAdminPath ? <Header currentPage={currentPage} /> : null}
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Service />} />
         <Route path="/service-detail" element={<ServiceDetail />} />
@@ -52,15 +57,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/register" element={<AdminRegister />} />
-        <Route element={<AdminProtectedRoute />}>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-          </Route>
-        </Route>
-
         <Route path="/financial-analysis" element={<ServiceDetail />} />
         <Route path="/taxation-planning" element={<ServiceDetail />} />
         <Route path="/investment-trading" element={<ServiceDetail />} />
@@ -69,6 +65,23 @@ function App() {
         <Route path="/testimonials" element={<Testimonials />} />
         <Route path="/privacy-policy" element={<Privacypolicy />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
+
+        {/* Admin Auth Routes (public) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
+
+        {/* Admin Protected Routes */}
+        <Route element={<AdminProtectedRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminBlogs />} />
+            <Route path="blogs" element={<AdminBlogs />} />
+            <Route path="teams" element={<AdminTeams />} />
+            <Route path="services" element={<AdminServices />} />
+            <Route path="contacts" element={<AdminContacts />} />
+            <Route path="users" element={<AdminUsers />} />
+          </Route>
+        </Route>
+
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       {!isAdminPath ? <Footer /> : null}
