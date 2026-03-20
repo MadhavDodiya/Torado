@@ -7,6 +7,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import contentRoutes from "./routes/contentRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import blogRoutes from "./routes/blogRoutes.js";
+import teamRoutes from "./routes/teamRoutes.js";
+import serviceRoutes from "./routes/serviceRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
@@ -27,6 +30,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use("/api/team", teamRoutes);
+app.use("/api/services", serviceRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
