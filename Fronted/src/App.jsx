@@ -4,10 +4,10 @@ import Service from './Pages/Service'
 import ServiceDetail from './Pages/ServiceDetail'
 import Aboutus from './Pages/Aboutus'
 import Pricingplans from './Pages/Pricingplans'
-import Faqs from './Pages/Faqs'
+import Faqs from "./Pages/Faq's"
 import Testimonials from './Pages/Testimonials'
 import Privacypolicy from './Pages/Privacypolicy'
-import TermAndCondition from './Pages/TermAndCondition'
+import TermAndCondition from './Pages/Term&condition'
 import Portfolio from './Pages/Portfolio'
 import Teams from './Pages/Teams'
 import TeamDetail from './Pages/TeamDetail'
@@ -21,6 +21,7 @@ import Header from './Components/Header'
 import Footer from './Components/Footer'
 import AdminLogin from './admin/pages/AdminLogin'
 import AdminRegister from './admin/pages/AdminRegister'
+import AdminDashboard from './admin/pages/AdminDashboard'
 import AdminBlogs from './admin/pages/AdminBlogs'
 import AdminTeams from './admin/pages/AdminTeams'
 import AdminServices from './admin/pages/AdminServices'
@@ -66,14 +67,14 @@ function App() {
         <Route path="/privacy-policy" element={<Privacypolicy />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
 
-        {/* Admin Auth Routes (public) */}
+        {/* Admin Auth Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
 
         {/* Admin Protected Routes */}
         <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminBlogs />} />
+            <Route index element={<AdminDashboard />} />
             <Route path="blogs" element={<AdminBlogs />} />
             <Route path="teams" element={<AdminTeams />} />
             <Route path="services" element={<AdminServices />} />
