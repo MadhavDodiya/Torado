@@ -110,9 +110,7 @@ function Footer() {
                 letterSpacing: '0.1em',
                 fontSize: '0.75rem',
                 whiteSpace: 'nowrap',
-                border: 'none',
-              }}
-            >
+                border: 'none',}}>
               GET IN TOUCH TODAY
             </Link>
           </div>
