@@ -1,6 +1,8 @@
-import React from 'react'
+import { useMemo } from 'react'
 import heroImg from '../assets/Image/service-bg.jpg'
 import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
 import team1 from '../assets/Image/team1.jpg'
 import team2 from '../assets/Image/team2.jpg'
@@ -8,20 +10,73 @@ import team3 from '../assets/Image/team3.jpg'
 import team4 from '../assets/Image/team4.jpg'
 import usePageContent from '../hooks/usePageContent'
 
-const members = [
-  { name: 'William Benjamin', role: 'Financial Advisor', img: team1 },
-  { name: 'Sophia Isabella', role: 'Financial Head', img: team2 },
-  { name: 'Michael Pluim', role: 'Head Office Manager', img: team3 },
-  { name: 'Charlotte Allen', role: 'Account Manager', img: team4 },
-  { name: 'Daniel Morgan', role: 'Investment Strategist', img: team1 },
-  { name: 'Emma Collins', role: 'Risk Consultant', img: team2 },
+const TEAM_IMAGE_POOL = [team1, team2, team3, team4]
+
+const TEAM_PLACEHOLDERS = [
+  {
+    id: 'team-1',
+    name: 'William Benjamin',
+    position: 'Financial Advisor',
+    profileImage: { url: team1 },
+  },
+  {
+    id: 'team-2',
+    name: 'Sophia Isabella',
+    position: 'Financial Head',
+    profileImage: { url: team2 },
+  },
+  {
+    id: 'team-3',
+    name: 'Michael Pluim',
+    position: 'Head Office Manager',
+    profileImage: { url: team3 },
+  },
+  {
+    id: 'team-4',
+    name: 'Charlotte Allen',
+    position: 'Account Manager',
+    profileImage: { url: team4 },
+  },
+  {
+    id: 'team-5',
+    name: 'Daniel Morgan',
+    position: 'Investment Strategist',
+    profileImage: { url: team1 },
+  },
+  {
+    id: 'team-6',
+    name: 'Emma Collins',
+    position: 'Risk Consultant',
+    profileImage: { url: team2 },
+  },
 ]
+
+const getTeamImage = (member, index) =>
+  member?.profileImage?.url ||
+  member?.profileImage?.relativeUrl ||
+  TEAM_IMAGE_POOL[index % TEAM_IMAGE_POOL.length]
 
 const defaultContent = { pageTitle: 'Team' }
 
 function Teams() {
   const content = usePageContent('teams', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
+  const { data: teamPayload } = useQuery({
+    queryKey: ['team', 'listing'],
+    queryFn: () => fetchJson('/api/team?limit=9'),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
+  const members = useMemo(() => {
+    const records = teamPayload?.data ?? TEAM_PLACEHOLDERS
+    return records.map((member, index) => ({
+      id: member._id ?? member.id ?? `team-${index}`,
+      name: member.name,
+      role: member.position || member.role || 'Team Member',
+      img: getTeamImage(member, index),
+    }))
+  }, [teamPayload?.data])
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -73,11 +128,9 @@ function Teams() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
               <Link
-                key={member.name}
-                to="/teamdetails"
-                state={{ member }}
+                key={member.id}
+                to={`/teamdetails?id=${member.id}`}
                 className="block text-black no-underline hover:text-black hover:no-underline focus:text-black focus:no-underline active:text-black active:no-underline visited:text-black"
-                style={{ textDecoration: 'none', color: 'black' }}
               >
                 <article className="h-full rounded-lg bg-white p-6 shadow transition duration-300 hover:shadow-xl">
                   <div className="relative mb-6 overflow-hidden rounded-lg">

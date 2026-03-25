@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import {
     FaChartLine,
     FaChevronLeft,
@@ -68,96 +70,228 @@ const defaultContent = {
     heroButtonText: 'HOW CAN WE HELP',
 }
 
+const SERVICE_IMAGE_POOL = [service1, service2, service3, service4, service5]
+const TEAM_IMAGE_POOL = [team1, team2, team3, team4]
+const BLOG_IMAGE_POOL = [blog1, blog2, blog3]
+
+const HOME_SERVICE_PLACEHOLDERS = [
+    {
+        id: 'service-financial-analysis',
+        title: 'Financial Analysis',
+        featuredImage: { url: service1 },
+    },
+    {
+        id: 'service-taxation',
+        title: 'Taxation Planning',
+        featuredImage: { url: service2 },
+    },
+    {
+        id: 'service-investment',
+        title: 'Investment Trading',
+        featuredImage: { url: service3 },
+    },
+]
+
+const FALLBACK_TEAM_MEMBERS = [
+    {
+        id: 'team-1',
+        name: 'William Benjamin',
+        role: 'Financial Advisor',
+        position: 'Financial Advisor',
+        profileImage: { url: team1 },
+    },
+    {
+        id: 'team-2',
+        name: 'Sophia Isabella',
+        role: 'Financial Head',
+        position: 'Financial Head',
+        profileImage: { url: team2 },
+    },
+    {
+        id: 'team-3',
+        name: 'Michael Pluim',
+        role: 'Head Office Manager',
+        position: 'Head Office Manager',
+        profileImage: { url: team3 },
+    },
+    {
+        id: 'team-4',
+        name: 'Charlotte Allen',
+        role: 'Account Manager',
+        position: 'Account Manager',
+        profileImage: { url: team4 },
+    },
+    {
+        id: 'team-5',
+        name: 'Daniel Morgan',
+        role: 'Investment Strategist',
+        position: 'Investment Strategist',
+        profileImage: { url: team1 },
+    },
+    {
+        id: 'team-6',
+        name: 'Emma Collins',
+        role: 'Risk Consultant',
+        position: 'Risk Consultant',
+        profileImage: { url: team2 },
+    },
+]
+
+const FALLBACK_BLOGS = [
+    {
+        id: 'blog-1',
+        category: 'business & finance',
+        title: 'How To Start Getting More Of a Return From Your Savings',
+        featuredImage: { url: blog1 },
+        published_date: '2025-07-19T00:00:00.000Z',
+    },
+    {
+        id: 'blog-2',
+        category: 'finance',
+        title: 'Consulted Admitting Wooded Is Power Acuteness',
+        featuredImage: { url: blog2 },
+        published_date: '2025-07-23T00:00:00.000Z',
+    },
+    {
+        id: 'blog-3',
+        category: 'business',
+        title: 'Popular Consultants are Big Meetup 2025',
+        featuredImage: { url: blog3 },
+        published_date: '2025-07-15T00:00:00.000Z',
+    },
+]
+
+const SERVICE_ICON_COMPONENTS = [FaLightbulb, FaCogs, FaChartLine, FaHandshake]
+
+const DEFAULT_SERVICE_GROWTH_ITEMS = [
+    {
+        id: 'service-growth-1',
+        title: 'Business Tax Reforms',
+        description:
+            'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
+        image: service3,
+        icon: <FaLightbulb />,
+    },
+    {
+        id: 'service-growth-2',
+        title: 'Process Development',
+        description:
+            'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
+        image: service4,
+        icon: <FaCogs />,
+    },
+    {
+        id: 'service-growth-3',
+        title: 'Manage Investment',
+        description:
+            'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
+        image: service5,
+        icon: <FaChartLine />,
+    },
+    {
+        id: 'service-growth-4',
+        title: 'Financial Growth Planning',
+        description:
+            'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
+        image: service1,
+        icon: <FaHandshake />,
+    },
+]
+
+const getServiceImage = (service, index) =>
+    service?.featuredImage?.url ||
+    service?.featuredImage?.relativeUrl ||
+    SERVICE_IMAGE_POOL[index % SERVICE_IMAGE_POOL.length]
+
+const getTeamImage = (member, index) =>
+    member?.profileImage?.url ||
+    member?.profileImage?.relativeUrl ||
+    TEAM_IMAGE_POOL[index % TEAM_IMAGE_POOL.length]
+
+const getBlogImage = (blog, index) =>
+    blog?.featuredImage?.url ||
+    blog?.featuredImage?.relativeUrl ||
+    BLOG_IMAGE_POOL[index % BLOG_IMAGE_POOL.length]
+
+const formatBlogDate = (value) => {
+    const fallback = new Date()
+    const date = value ? new Date(value) : fallback
+    if (Number.isNaN(date.getTime())) {
+        return {
+            day: '01',
+            month: 'JAN',
+            year: fallback.getFullYear(),
+        }
+    }
+    return {
+        day: String(date.getDate()).padStart(2, '0'),
+        month: date.toLocaleString('default', { month: 'short' }).toUpperCase(),
+        year: date.getFullYear(),
+    }
+}
+
+const buildServiceGrowthItems = (records) => {
+    if (!records.length) {
+        return DEFAULT_SERVICE_GROWTH_ITEMS
+    }
+
+    return records.map((service, index) => {
+        const description =
+            service.shortDescription ||
+            service.description ||
+            'Torado ke specialists aapke business ko sahi track par rakhte hain.'
+
+        const Icon = SERVICE_ICON_COMPONENTS[index % SERVICE_ICON_COMPONENTS.length]
+        return {
+            id: service._id ?? service.id ?? `service-growth-${index}`,
+            title: service.title || 'Untitled Service',
+            description,
+            image: getServiceImage(service, index + 3),
+            icon: <Icon size={26} />,
+        }
+    })
+}
+
 function Home() {
     const content = usePageContent('home', defaultContent)
-    const services = useMemo(
-        () => [
-            { title: 'Financial Analysis', image: service1 },
-            { title: 'Taxation Planning', image: service2, highlight: true },
-            { title: 'Investment Trading', image: service3 },
-        ],
-        [],
-    )
+    const { data: servicesPayload } = useQuery({
+        queryKey: ['services', 'home-preview'],
+        queryFn: () => fetchJson('/api/services?limit=3'),
+        staleTime: 1000 * 60,
+        refetchOnWindowFocus: false,
+        retry: 1,
+    })
+    const services = useMemo(() => {
+        const records = servicesPayload?.data ?? HOME_SERVICE_PLACEHOLDERS
+        return records.map((service, index) => ({
+            id: service._id ?? service.id ?? `home-service-${index}`,
+            title: service.title || 'Torado Service',
+            image: getServiceImage(service, index),
+            highlight: index === 1,
+        }))
+    }, [servicesPayload?.data])
 
     const serviceGrowth = useMemo(
-        () => [
-            {
-                title: 'Business Tax Reforms',
-                description:
-                    'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
-                image: service3,
-                icon: <FaLightbulb />,
-            },
-            {
-                title: 'Process Development',
-                description:
-                    'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
-                image: service4,
-                icon: <FaCogs />,
-            },
-            {
-                title: 'Manage Investment',
-                description:
-                    'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
-                image: service5,
-                icon: <FaChartLine />,
-            },
-            {
-                title: 'Financial Growth Planning',
-                description:
-                    'Pellentesque at posuere tellus sed dui justo scelerisque turpis arcu ut pulvinar lectus tristique non ptoy laoreet risus vel.',
-                image: service1,
-                icon: <FaHandshake />,
-            },
-        ],
-        [],
+        () => buildServiceGrowthItems(servicesPayload?.data ?? []),
+        [servicesPayload?.data],
     )
 
-    const members = useMemo(
-        () => [
-            {
-                name: 'William Benjamin',
-                role: 'Financial Advisor',
-                img: team1,
-            },
-            {
-                name: 'Sophia Isabella',
-                role: 'Financial Head',
-                img: team2,
-            },
-            {
-                name: 'Michael Pluim',
-                role: 'Head Office Manager',
-                img: team3,
-            },
-            {
-                name: 'Charlotte Allen',
-                role: 'Account Manager',
-                img: team4,
-            },
-            {
-                name: 'Daniel Morgan',
-                role: 'Investment Strategist',
-                img: team1,
-            },
-            {
-                name: 'Emma Collins',
-                role: 'Risk Consultant',
-                img: team2,
-            },
-            {
-                name: 'Noah Bennett',
-                role: 'Tax Specialist',
-                img: team3,
-            },
-            {
-                name: 'Olivia Turner',
-                role: 'Client Relations Lead',
-                img: team4,
-            },
-        ],
-        [],
-    )
+    const { data: teamPayload } = useQuery({
+        queryKey: ['team', 'home-preview'],
+        queryFn: () => fetchJson('/api/team?limit=8'),
+        staleTime: 1000 * 60,
+        refetchOnWindowFocus: false,
+        retry: 1,
+    })
+    const members = useMemo(() => {
+        const records = teamPayload?.data ?? FALLBACK_TEAM_MEMBERS
+        return records.map((member, index) => ({
+            id: member._id ?? member.id ?? `team-${index}`,
+            name: member.name,
+            role: member.position || member.role || 'Team Member',
+            img: getTeamImage(member, index),
+        }))
+    }, [teamPayload?.data])
 
     const projects = useMemo(
         () => [
@@ -256,30 +390,30 @@ function Home() {
         [],
     )
 
-    const blogs = [
-        {
-            id: 1,
-            category: "BUSINESS & FINANCE",
-            title: "How To Start Getting More Of a Return From Your Savings",
-            image: blog1,
-            date: "19",
-        },
-        {
-            id: 2,
-            category: "FINANCE",
-            title: "Consulted Admitting Wooded Is Power Acuteness",
-            image: blog2,
-            date: "23",
-            dark: true,
-        },
-        {
-            id: 3,
-            category: "BUSINESS",
-            title: "Popular Consultants are Big Meetup 2025",
-            image: blog3,
-            date: "15",
-        },
-    ];
+    const { data: blogsPayload } = useQuery({
+        queryKey: ['blogs', 'home-preview'],
+        queryFn: () => fetchJson('/api/blogs?limit=3'),
+        staleTime: 1000 * 60,
+        refetchOnWindowFocus: false,
+        retry: 1,
+    })
+    const blogs = useMemo(() => {
+        const records = blogsPayload?.data ?? FALLBACK_BLOGS
+        return records.map((blog, index) => {
+            const { day, month, year } = formatBlogDate(
+                blog.published_date ?? blog.createdAt ?? blog.updatedAt,
+            )
+            return {
+                id: blog._id ?? blog.id ?? `blog-${index}`,
+                category: (blog.category || 'General').toUpperCase(),
+                title: blog.title || 'Torado Insight',
+                image: getBlogImage(blog, index),
+                day,
+                month,
+                year,
+            }
+        })
+    }, [blogsPayload?.data])
 
     const totalGrowthSlides = serviceGrowth.length
     const [visibleSlides, setVisibleSlides] = useState(() => getVisibleSlides())
@@ -500,13 +634,17 @@ function Home() {
             <section className="service-section">
                 <div className="service-container">
                     <div className="service-grid">
-                        {services.map((service, index) => (
-                            <div key={index} className="service-card-wrap">
+                        {services.map((service) => (
+                            <Link
+                                key={service.id}
+                                to={`/service-detail?id=${service.id}`}
+                                className="service-card-wrap"
+                            >
                                 <img src={service.image} alt={service.title} className="service-image" />
                                 <div className={`service-card${service.highlight ? ' service-card-highlight' : ''}`}>
                                     <h3>{service.title}</h3>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                     <div className="service-bottom-text">
@@ -617,7 +755,16 @@ function Home() {
                                             <div className="service-growth-content">
                                                 <h3>{item.title}</h3>
                                                 <p>{item.description}</p>
-                                    <Link to={getPagePath('service-detail')}>Read More -&gt;</Link>
+                                                <Link
+                                                    to={
+                                                        item.id
+                                                            ? `/service-detail?id=${item.id}`
+                                                            : getPagePath('service-detail')
+                                                    }
+                                                    className="text-sm font-semibold text-red-500 underline"
+                                                >
+                                                    Read More -&gt;
+                                                </Link>
                                             </div>
                                         </div>
                                     </article>
@@ -1257,9 +1404,9 @@ function Home() {
 
                                     {/* Date */}
                                     <div className="blog-news-date">
-                                        <p className="text-2xl font-bold">{blog.date}</p>
-                                        <p className="text-xs">Jul</p>
-                                        <p className="text-xs">2025</p>
+                                        <p className="text-2xl font-bold">{blog.day}</p>
+                                        <p className="text-xs">{blog.month}</p>
+                                        <p className="text-xs">{blog.year}</p>
                                     </div>
                                 </div>
 
@@ -1269,9 +1416,12 @@ function Home() {
 
                                     <h3 className="blog-news-title">{blog.title}</h3>
 
-                                    <button className="blog-news-button" type="button">
+                                    <Link
+                                        to={`/blog-details?id=${blog.id}`}
+                                        className="blog-news-button no-underline"
+                                    >
                                         READ MORE
-                                    </button>
+                                    </Link>
                                 </div>
                             </article>
                         ))}

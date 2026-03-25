@@ -1,5 +1,6 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import {
   FaPhoneAlt,
   FaEnvelope,
@@ -21,15 +22,32 @@ const defaultContent = {
   pageTitle: 'Team Detail',
 }
 
+const FALLBACK_TEAM_MEMBER = {
+  name: 'Emma Charlotte',
+  role: 'Financial Head',
+  bio: 'Pellentesque at posuere tellus. Ut sed dui justo. Phasellus scelerisque turpis pulvinar lectus tristique non.',
+  phone: '(+212)-226-3126',
+  email: 'hello@torado.com',
+  profileImage: { url: team2 },
+}
+
 function TeamDetail() {
   const content = usePageContent('team-detail', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
-  let location = useLocation()
-  let selectedMember = location.state?.member ?? {
-    name: 'Emma Charlotte',
-    role: 'Financial Head',
-    img: team2,
-  }
+  const [searchParams] = useSearchParams()
+  const memberId = searchParams.get('id')
+
+  const { data: memberPayload } = useQuery({
+    queryKey: ['teamMember', memberId],
+    queryFn: () => fetchJson(`/api/team/${memberId}`),
+    enabled: Boolean(memberId),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
+
+  const selectedMember = memberPayload?.data ?? FALLBACK_TEAM_MEMBER
+  const memberImage = selectedMember.profileImage?.url || selectedMember.profileImage?.relativeUrl || team2
 
   return (
     <>
@@ -43,7 +61,7 @@ function TeamDetail() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="w-full">
             <img
-              src={selectedMember.img}
+              src={memberImage}
               alt={selectedMember.name}
               className="h-[400px] w-full rounded-lg object-cover shadow-md lg:h-[500px]"
             />
@@ -55,41 +73,38 @@ function TeamDetail() {
             <p className="mb-4 font-medium text-red-500">{selectedMember.role}</p>
 
             <p className="mb-6 leading-relaxed text-gray-500">
-              Pellentesque at posuere tellus. Ut sed dui justo. Phasellus scelerisque
-              turpis pulvinar lectus tristique non. Nam laoreet, risus vel laoreet
-              laoreet, mauris risus velit id imperdiet ante nisi in ante. Integer
-              consectetur in nisi mattis tincidunt.
+              {selectedMember.bio}
             </p>
 
-            <div className="mb-6 flex items-start gap-4">
-              <div className="rounded-full bg-gray-200 p-3">
-                <FaPhoneAlt className="text-gray-700" />
+              <div className="mb-6 flex items-start gap-4">
+                <div className="rounded-full bg-gray-200 p-3">
+                  <FaPhoneAlt className="text-gray-700" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-[#0f172a]">
+                    Phone No: {selectedMember.phone || FALLBACK_TEAM_MEMBER.phone}
+                  </h4>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Pellentesque at posuere tellus. Ut sed dui justo. Phasellus
+                    scelerisque pulvinar lectus tristique.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-[#0f172a]">
-                  Phone No: (+212)-226-3126
-                </h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  Pellentesque at posuere tellus. Ut sed dui justo. Phasellus
-                  scelerisque pulvinar lectus tristique.
-                </p>
-              </div>
-            </div>
 
-            <div className="mb-6 flex items-start gap-4">
-              <div className="rounded-full bg-gray-200 p-3">
-                <FaEnvelope className="text-gray-700" />
+              <div className="mb-6 flex items-start gap-4">
+                <div className="rounded-full bg-gray-200 p-3">
+                  <FaEnvelope className="text-gray-700" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-[#0f172a]">
+                    Email: {selectedMember.email || FALLBACK_TEAM_MEMBER.email}
+                  </h4>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Pellentesque at posuere tellus. Ut sed dui justo. Phasellus
+                    scelerisque pulvinar lectus tristique.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-[#0f172a]">
-                  Email: hello@torado.com
-                </h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  Pellentesque at posuere tellus. Ut sed dui justo. Phasellus
-                  scelerisque pulvinar lectus tristique.
-                </p>
-              </div>
-            </div>
 
             <div className="mt-6 flex gap-4">
               {[FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn].map((Icon, index) => (

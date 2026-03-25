@@ -37,4 +37,5 @@ app.use("/api/services", serviceRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+app.set("io", null); // Init io holder
 export default app;

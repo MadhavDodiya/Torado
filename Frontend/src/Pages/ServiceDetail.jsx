@@ -1,5 +1,7 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import { FiArrowRight, FiSearch } from 'react-icons/fi'
 import heroImg from '../assets/Image/service-bg.jpg'
 import service1 from '../assets/Image/imgi_19_service1.png'
@@ -8,28 +10,81 @@ import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Service Detail' }
 
+const DEFAULT_FEATURES = [
+  'Get Your Final Result',
+  'Project Monitoring',
+  'Core Project Monitoring',
+]
+
+const DEFAULT_STRATEGIES = [
+  'Pras enim urna, interdum nec porttitor vitae, wsit amet neque auctor ornare justouis dictum ex accumsan eleifend.',
+  'Pras enim urna, interdum nec porttitor vitae, wsit amet neque auctor ornare justouis dictum ex accumsan eleifend.',
+]
+
+const FALLBACK_SERVICE = {
+  title: 'Business Tax Reforms',
+  description:
+    'Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna.',
+  shortDescription:
+    'Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna.',
+  featuredImage: { url: service1 },
+  features: [
+    { title: 'Project Monitoring', description: 'Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros.' },
+    { title: 'Core Project Monitoring', description: 'Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros.' },
+  ],
+}
+
+const getServiceImage = (service) =>
+  service?.featuredImage?.url || service?.featuredImage?.relativeUrl || service1
+
 function ServiceDetail() {
   const content = usePageContent('service-detail', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
 
   const categories = [
-    "Financial Analysis",
-    "Taxation Planning",
-    "Investment Trading",
-    "Wealth Marketing",
-    "Planning Strategies",
+    'Financial Analysis',
+    'Taxation Planning',
+    'Investment Trading',
+    'Wealth Marketing',
+    'Planning Strategies',
   ];
+  const [searchParams] = useSearchParams()
+  const location = useLocation()
+  const stateService = location.state?.service
+  const serviceId = searchParams.get('id') ?? (stateService?._id ?? stateService?.id)
 
-  const features = [
-    "Get Your Final Result",
-    "Project Monitoring",
-    "Core Project Monitoring",
-  ];
+  const { data: servicePayload } = useQuery({
+    queryKey: ['service-detail', serviceId],
+    queryFn: () => fetchJson(`/api/services/${serviceId}`),
+    enabled: Boolean(serviceId),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
 
-  const strategies = [
-    "Pras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. wsit amet neque auctor ornare justouis dictum ex accumsan eleifend.",
-    "Pras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. wsit amet neque auctor ornare justouis dictum ex accumsan eleifend.",
-  ];
+  const service = servicePayload?.data ?? stateService ?? FALLBACK_SERVICE
+  const serviceImage = getServiceImage(service)
+
+  const featureList = useMemo(() => {
+    if (Array.isArray(service.features) && service.features.length) {
+      const mapped = service.features
+        .map((item) => item.title || item.description)
+        .filter(Boolean)
+      if (mapped.length) return mapped
+    }
+    return DEFAULT_FEATURES
+  }, [service.features])
+
+  const strategyList = useMemo(() => {
+    if (Array.isArray(service.features) && service.features.length) {
+      const descriptions = service.features
+        .map((item) => item.description)
+        .filter(Boolean)
+        .slice(0, 2)
+      if (descriptions.length) return descriptions
+    }
+    return DEFAULT_STRATEGIES
+  }, [service.features])
 
   return (
     <>
@@ -84,18 +139,18 @@ function ServiceDetail() {
             {/* Business Tax Reforms */}
             <div>
               <h2 className="text-4xl font-bold text-[#0f1f3d] mb-6">
-                Business Tax Reforms
+                {service.title}
               </h2>
 
               <p className="text-gray-600 leading-relaxed mb-6">
-                Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque, odio eu tempor pulvinar magna tortor finibus lorem, ut mattis tellus nunc ut quam. Curabitur quis ornare leo. Suspendisse bibendum nibh non turpis vestibulum pellentesque consectetur adipisci lorem ipsum dolor sit amet.
+                {service.description}
               </p>
 
               <p className="text-gray-600 leading-relaxed mb-8">
-                Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urnaone csit amet neque auctor, ornare dui rutrum, condimentum justouis dictum ex accumsan eleifend.
+                {service.shortDescription}
               </p>
 
-              <img src={service1} alt="business" className="rounded-lg w-full object-cover" />
+              <img src={serviceImage} alt={service.title} className="rounded-lg w-full object-cover" />
             </div>
 
 
@@ -119,7 +174,7 @@ function ServiceDetail() {
                   </p>
 
                   <div className="space-y-4">
-                    {features.map((item, i) => (
+                    {featureList.map((item, i) => (
                       <div key={i} className="flex items-center gap-3 bg-[#f4e3e5] p-4 rounded-md">
                         <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                         <span className="text-gray-800 font-medium">{item}</span>
@@ -148,7 +203,7 @@ function ServiceDetail() {
               </p>
 
               <div className="space-y-4">
-                {strategies.map((item, i) => (
+                {strategyList.map((item, i) => (
                   <div key={i} className="flex gap-4 items-start">
 
                     <div className="bg-red-500 text-white p-3 rounded-md">

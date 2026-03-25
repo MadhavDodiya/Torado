@@ -1,5 +1,7 @@
-import React from 'react'
+import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import {
   FaChartLine,
   FaCogs,
@@ -82,12 +84,60 @@ const steps = [
   },
 ]
 
+const SERVICE_FALLBACK_IMAGES = [service1, service2, service3, service4, service5]
+
+const SERVICE_DESCRIPTION_FALLBACK =
+  'Expert assistance for finance, taxation, and investment planning with measurable outcomes.'
+
+const SERVICE_PLACEHOLDERS = [
+  {
+    id: 'service-financial-analysis',
+    title: 'Financial Analysis',
+    shortDescription: 'Actionable insights for every report and investor update.',
+    featuredImage: { url: service1 },
+  },
+  {
+    id: 'service-taxation-planning',
+    title: 'Taxation Planning',
+    shortDescription: 'Practical compliance and optimization strategies to reduce risk.',
+    featuredImage: { url: service2 },
+  },
+  {
+    id: 'service-investment-trading',
+    title: 'Investment Trading',
+    shortDescription: 'Informed trading support fueled by data-backed research.',
+    featuredImage: { url: service3 },
+  },
+]
+
+const getServiceImage = (service, index) =>
+  service?.featuredImage?.url ||
+  service?.featuredImage?.relativeUrl ||
+  SERVICE_FALLBACK_IMAGES[index % SERVICE_FALLBACK_IMAGES.length]
+
 const defaultContent = { pageTitle: 'Our Services' }
 
 function Service() {
   const content = usePageContent('services', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
   const navigate = useNavigate()
+  const { data: servicesPayload } = useQuery({
+    queryKey: ['services', 'listing'],
+    queryFn: () => fetchJson('/api/services?limit=6'),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
+  const serviceList = useMemo(() => {
+    const records = servicesPayload?.data ?? SERVICE_PLACEHOLDERS
+    return records.map((service, index) => ({
+      id: service._id ?? service.id ?? `service-${index}`,
+      title: service.title ?? 'Torado Service',
+      description: service.shortDescription || service.description || SERVICE_DESCRIPTION_FALLBACK,
+      image: getServiceImage(service, index),
+      highlight: index === 1,
+    }))
+  }, [servicesPayload?.data])
 
   return (
     <>
@@ -141,6 +191,28 @@ function Service() {
             />
           </div>
 
+        </div>
+      </section>
+
+      <section className="service-section">
+        <div className="service-container">
+          <div className="service-grid">
+            {serviceList.map((service) => (
+              <Link
+                key={service.id}
+                to={`/service-detail?id=${service.id}`}
+                className="service-card-wrap"
+              >
+                <img src={service.image} alt={service.title} className="service-image" />
+                <div className={`service-card${service.highlight ? ' service-card-highlight' : ''}`}>
+                  <h3>{service.title}</h3>
+                  {service.description ? (
+                    <p className="text-sm text-slate-500 mt-2">{service.description}</p>
+                  ) : null}
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

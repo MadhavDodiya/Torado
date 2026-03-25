@@ -79,6 +79,12 @@ export const createBlog = async (req, res, next) => {
 
     const savedBlog = await newBlog.save();
 
+    // Real-time update
+    const io = req.app.get('io');
+    if (io) {
+      io.to('blogs').emit('blogsUpdated');
+    }
+
     return res.status(201).json({ 
       message: "Blog created successfully", 
       data: savedBlog 
@@ -119,6 +125,12 @@ export const updateBlog = async (req, res, next) => {
       return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Real-time update
+    const io = req.app.get('io');
+    if (io) {
+      io.to('blogs').emit('blogsUpdated');
+    }
+
     return res.status(200).json({ 
       message: "Blog updated successfully", 
       data: updatedBlog 
@@ -143,6 +155,12 @@ export const deleteBlog = async (req, res, next) => {
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // Real-time update
+    const io = req.app.get('io');
+    if (io) {
+      io.to('blogs').emit('blogsUpdated');
     }
 
     return res.status(200).json({ message: "Blog deleted successfully" });

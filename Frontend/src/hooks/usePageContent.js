@@ -1,62 +1,25 @@
-import { useEffect, useState } from 'react'
-import { buildApiUrl } from '../utils/api'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 
-const contentCache = new Map()
+const fetchPageContent = (slug) => fetchJson(`/api/content/${slug}`)
 
-function usePageContent(slug, fallback = {}) {
-  const normalizedSlug = String(slug || '').trim().toLowerCase()
+export default function usePageContent(slug, fallback = {}) {
+  const enabled = Boolean(slug)
 
-  const [contentBySlug, setContentBySlug] = useState(() => {
-    if (normalizedSlug && contentCache.has(normalizedSlug)) {
-      return { [normalizedSlug]: contentCache.get(normalizedSlug) }
-    }
-    return {}
+  const { data, isSuccess } = useQuery({
+    queryKey: ['pageContent', slug],
+    queryFn: () => fetchPageContent(slug),
+    enabled,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    refetchOnWindowFocus: false,
   })
 
-  useEffect(() => {
-    if (!normalizedSlug) return
-
-    // Cache hit: no state update needed if already seeded
-    if (contentCache.has(normalizedSlug)) {
-      const cached = contentCache.get(normalizedSlug)
-      setContentBySlug((prev) => {
-        if (prev[normalizedSlug]) return prev
-        return { ...prev, [normalizedSlug]: cached }
-      })
-      return
+  return useMemo(() => {
+    if (isSuccess && data?.data) {
+      return { ...fallback, ...data.data }
     }
-
-    let active = true
-
-    const fetchContent = async () => {
-      try {
-        const response = await fetch(buildApiUrl(`/api/content/${normalizedSlug}`))
-
-        if (!response.ok) return
-
-        const data = await response.json().catch(() => null)
-
-        if (!data?.data) return
-
-        contentCache.set(normalizedSlug, data.data)
-
-        if (active) {
-          setContentBySlug((prev) => ({ ...prev, [normalizedSlug]: data.data }))
-        }
-      } catch {
-        // no-op: keep fallback when request fails
-      }
-    }
-
-    fetchContent()
-
-    return () => {
-      active = false
-    }
-  }, [normalizedSlug])
-
-  if (!normalizedSlug) return fallback
-  return contentBySlug[normalizedSlug] ?? contentCache.get(normalizedSlug) ?? fallback
+    return fallback
+  }, [fallback, data, isSuccess])
 }
-
-export default usePageContent

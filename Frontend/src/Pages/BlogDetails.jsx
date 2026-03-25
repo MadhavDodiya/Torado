@@ -1,5 +1,7 @@
-﻿import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import {
   FaArrowRight,
   FaSearch,
@@ -8,14 +10,62 @@ import {
   FaInstagram,
   FaLinkedinIn,
 } from 'react-icons/fa'
-import heroImg from '../assets/Image/service-bg.jpg'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Blog Details' }
 
+const FALLBACK_BLOG_DETAIL = {
+  title: 'How To Start Getting More Of a Return From Your Savings',
+  category: 'BUSINESS & FINANCE',
+  author: 'Torado Team',
+  content:
+    'Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna.',
+  featuredImage: { url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72' },
+  published_date: '2025-07-19T00:00:00.000Z',
+}
+
+const formatBlogDate = (value) => {
+  const fallback = new Date()
+  const date = value ? new Date(value) : fallback
+  if (Number.isNaN(date.getTime())) {
+    return {
+      day: '01',
+      month: 'JAN',
+      year: fallback.getFullYear(),
+    }
+  }
+  return {
+    day: String(date.getDate()).padStart(2, '0'),
+    month: date.toLocaleString('default', { month: 'short' }).toUpperCase(),
+    year: date.getFullYear(),
+  }
+}
+
+const getBlogImage = (blog) =>
+  blog?.featuredImage?.url || blog?.featuredImage?.relativeUrl || 'https://images.unsplash.com/photo-1556761175-b413da4baf72'
+
 function BlogDetails() {
   const content = usePageContent('blog-details', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
+  const [searchParams] = useSearchParams()
+  const blogId = searchParams.get('id')
+
+  const { data: blogPayload } = useQuery({
+    queryKey: ['blog-detail', blogId],
+    queryFn: () => fetchJson(`/api/blogs/${blogId}`),
+    enabled: Boolean(blogId),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
+
+  const blog = blogPayload?.data ?? FALLBACK_BLOG_DETAIL
+  const heroImage = getBlogImage(blog)
+  const { day, month, year } = formatBlogDate(blog.published_date ?? blog.createdAt ?? blog.updatedAt)
+  const contentParagraphs = useMemo(() => {
+    if (!blog.content) return []
+    return blog.content.split(/\n+/).filter(Boolean)
+  }, [blog.content])
   return (
     <>
       <section className="relative w-full overflow-hidden">
@@ -45,7 +95,7 @@ function BlogDetails() {
           </div>
 
           <div className="relative min-h-[300px] overflow-hidden">
-            <img src={heroImg} alt="Blog details background" className="block h-full w-full object-cover object-top" />
+            <img src={heroImage} alt="Blog details background" className="block h-full w-full object-cover object-top" />
             <div
               className="absolute left-0 top-0 z-10 h-0 w-0"
               style={{
@@ -69,27 +119,31 @@ function BlogDetails() {
               />
 
               <div className="absolute left-6 top-6 rounded bg-red-600 px-4 py-3 text-center text-white">
-                <h3 className="text-xl font-bold">19</h3>
-                <p className="text-sm">Jul</p>
-                <p className="text-xs">2025</p>
+                <h3 className="text-xl font-bold">{day}</h3>
+                <p className="text-sm">{month}</p>
+                <p className="text-xs">{year}</p>
               </div>
             </div>
 
             <p className="mt-6 text-sm font-semibold tracking-wide text-red-600">
-              BUSINESS & FINANCE
+              {blog.category}
             </p>
 
             <h1 className="mt-4 text-3xl font-bold leading-tight text-[#0f172a] md:text-5xl">
-              How To Start Getting More Of a Return From Your Savings
+              {blog.title}
             </h1>
 
-            <p className="mt-6 leading-relaxed text-gray-500">
-              Cras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque, odio eu tempor pulvinar magna tortor finibus lorem, ut mattis tellus nunc ut quam. Curabitur quis ornare leo. Suspendisse bibendum nibh non turpis vestibulum pellentesque consectetur adipisci lorem ipsum dolor sit amet.
-              <br />
-              Pras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque.
-              <br />
-              Mras enim urna, interdum nec porttitor vitae, sollicitudin eu eros. Praesent eget mollis nulla, non lacinia urna. Donec sit amet neque auctor, ornare dui rutrum, condimentum justo. Duis dictum, ex accumsan eleifend eleifen ex justo aliquam nunc, in ultrices ante quam eget massa. Sed scelerisque.
-            </p>
+            {contentParagraphs.length ? (
+              contentParagraphs.map((paragraph, index) => (
+                <p key={index} className="mt-6 leading-relaxed text-gray-500">
+                  {paragraph}
+                </p>
+              ))
+            ) : (
+              <p className="mt-6 leading-relaxed text-gray-500">
+                {FALLBACK_BLOG_DETAIL.content}
+              </p>
+            )}
 
             <div className="mt-12">
               <div className="flex flex-col items-start justify-between gap-6 border-t pt-6 md:flex-row md:items-center">
@@ -98,10 +152,7 @@ function BlogDetails() {
 
                   <div className="flex gap-3">
                     <span className="rounded bg-gray-100 px-4 py-2 text-sm">
-                      Business
-                    </span>
-                    <span className="rounded bg-gray-100 px-4 py-2 text-sm">
-                      Development
+                      {blog.category}
                     </span>
                   </div>
                 </div>
@@ -121,13 +172,13 @@ function BlogDetails() {
               <div className="mt-8 grid gap-6 md:grid-cols-2">
                 <div className="rounded bg-gray-100 p-6">
                   <p className="font-medium leading-relaxed text-gray-800">
-                    Consulted Admitting Wooded Is Power Acuteness
+                    {blog.title}
                   </p>
                 </div>
 
                 <div className="rounded bg-gray-100 p-6 text-right">
                   <p className="font-medium leading-relaxed text-gray-800">
-                    Popular Consultants are Big Meetup 2025
+                    By {blog.author || FALLBACK_BLOG_DETAIL.author}
                   </p>
                 </div>
               </div>

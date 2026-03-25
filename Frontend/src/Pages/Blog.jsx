@@ -1,60 +1,89 @@
-﻿import React from 'react'
+import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import heroImg from '../assets/Image/service-bg.jpg'
 import blog1 from '../assets/Image/blog1.jpg'
 import blog2 from '../assets/Image/blog2.jpg'
 import blog3 from '../assets/Image/blog3.jpg'
+import { useQuery } from '@tanstack/react-query'
+import { fetchJson } from '../utils/api'
 import usePageContent from '../hooks/usePageContent'
 
 const defaultContent = { pageTitle: 'Blog' }
 
+const BLOG_IMAGE_POOL = [blog1, blog2, blog3]
+const BLOG_FALLBACKS = [
+  {
+    id: 'blog-1',
+    category: 'business & finance',
+    title: 'How To Start Getting More Of a Return From Your Savings',
+    featuredImage: { url: blog1 },
+    published_date: '2025-07-19T00:00:00.000Z',
+  },
+  {
+    id: 'blog-2',
+    category: 'finance',
+    title: 'Consulted Admitting Wooded Is Power Acuteness',
+    featuredImage: { url: blog2 },
+    published_date: '2025-07-23T00:00:00.000Z',
+  },
+  {
+    id: 'blog-3',
+    category: 'business',
+    title: 'Popular Consultants are Big Meetup 2025',
+    featuredImage: { url: blog3 },
+    published_date: '2025-07-15T00:00:00.000Z',
+  },
+]
+
+const formatBlogDate = (value) => {
+  const fallback = new Date()
+  const date = value ? new Date(value) : fallback
+  if (Number.isNaN(date.getTime())) {
+    return {
+      day: '01',
+      month: 'JAN',
+      year: fallback.getFullYear(),
+    }
+  }
+  return {
+    day: String(date.getDate()).padStart(2, '0'),
+    month: date.toLocaleString('default', { month: 'short' }).toUpperCase(),
+    year: date.getFullYear(),
+  }
+}
+
+const getBlogImage = (blog, index) =>
+  blog?.featuredImage?.url ||
+  blog?.featuredImage?.relativeUrl ||
+  BLOG_IMAGE_POOL[index % BLOG_IMAGE_POOL.length]
+
 function Blog() {
   const content = usePageContent('blog', defaultContent)
   const pageTitle = content.pageTitle || defaultContent.pageTitle
-  const blogs = [
-    {
-      id: 1,
-      category: 'BUSINESS & FINANCE',
-      title: 'How To Start Getting More Of a Return From Your Savings',
-      image: blog1,
-      date: '19',
-    },
-    {
-      id: 2,
-      category: 'FINANCE',
-      title: 'Consulted Admitting Wooded Is Power Acuteness',
-      image: blog2,
-      date: '23',
-    },
-    {
-      id: 3,
-      category: 'BUSINESS',
-      title: 'Popular Consultants are Big Meetup 2025',
-      image: blog3,
-      date: '15',
-    },
-    {
-      id: 4,
-      category: 'BUSINESS & FINANCE',
-      title: 'How To Start Getting More Of a Return From Your Savings',
-      image: blog1,
-      date: '19',
-    },
-    {
-      id: 5,
-      category: 'FINANCE',
-      title: 'Consulted Admitting Wooded Is Power Acuteness',
-      image: blog2,
-      date: '23',
-    },
-    {
-      id: 6,
-      category: 'BUSINESS',
-      title: 'Popular Consultants are Big Meetup 2025',
-      image: blog3,
-      date: '15',
-    },
-  ]
+  const { data: blogsPayload } = useQuery({
+    queryKey: ['blogs', 'listing'],
+    queryFn: () => fetchJson('/api/blogs?limit=6'),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  })
+  const blogs = useMemo(() => {
+    const records = blogsPayload?.data ?? BLOG_FALLBACKS
+    return records.map((blog, index) => {
+      const { day, month, year } = formatBlogDate(
+        blog.published_date ?? blog.createdAt ?? blog.updatedAt,
+      )
+      return {
+        id: blog._id ?? blog.id ?? `blog-${index}`,
+        category: (blog.category || 'General').toUpperCase(),
+        title: blog.title || 'Latest Insight',
+        image: getBlogImage(blog, index),
+        day,
+        month,
+        year,
+      }
+    })
+  }, [blogsPayload?.data])
 
   return (
     <>
@@ -113,9 +142,9 @@ function Blog() {
                   <img src={blog.image} className="blog-news-image" alt={blog.title} />
 
                   <div className="blog-news-date">
-                    <p className="text-2xl font-bold">{blog.date}</p>
-                    <p className="text-xs">Jul</p>
-                    <p className="text-xs">2025</p>
+                    <p className="text-2xl font-bold">{blog.day}</p>
+                    <p className="text-xs">{blog.month}</p>
+                    <p className="text-xs">{blog.year}</p>
                   </div>
                 </div>
 
@@ -124,7 +153,10 @@ function Blog() {
 
                   <h3 className="blog-news-title">{blog.title}</h3>
 
-                  <Link to="/blog-details" className="blog-news-button no-underline">
+                  <Link
+                    to={`/blog-details?id=${blog.id}`}
+                    className="blog-news-button no-underline"
+                  >
                     READ MORE
                   </Link>
                 </div>
@@ -138,3 +170,4 @@ function Blog() {
 }
 
 export default Blog
+
