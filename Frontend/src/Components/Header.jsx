@@ -96,8 +96,8 @@ export default function Header() {
     <header className="w-full">
       {/* Top Bar */}
       <div className="bg-[#0b2344] text-white">
-        <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 lg:px-8">
-          <div className="flex items-center gap-6 text-sm">
+        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 lg:px-8">
+          <div className="flex flex-wrap items-center gap-6 text-sm">
             <span className="hidden items-center gap-2 md:inline-flex">
               <FaMapMarkerAlt className="text-white" />
               838 Andy Street, Madison, NJ 08003
@@ -133,7 +133,7 @@ export default function Header() {
 
       {/* Main Nav */}
       <nav ref={navRef} className="border-b border-slate-100 bg-white shadow-sm">
-        <div className="mx-auto flex h-[96px] max-w-[1400px] items-center px-4 lg:px-8">
+        <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-4 px-4 lg:px-8">
           <Link to="/" onClick={closeMenus} className="shrink-0 no-underline" aria-label="Go to Home" style={linkResetStyle}>
             <img src={logo} alt="Torado logo" className="h-12 w-auto" />
           </Link>
@@ -364,7 +364,7 @@ export default function Header() {
             type="button"
             aria-label="Toggle menu"
             onClick={() => setMobileOpen((prev) => !prev)}
-            className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 text-slate-700 lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 text-slate-700 lg:hidden"
           >
             {mobileOpen ? <FaTimes /> : <FaBars />}
           </button>

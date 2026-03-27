@@ -1115,3 +1115,97 @@ a:visited {
     right: -8px;
   }
 }
+
+@media (max-width: 480px) {
+  .hero-left {
+    padding: 32px 16px 24px;
+  }
+
+  .hero-left h1 {
+    font-size: 36px;
+  }
+
+  .hero-left p {
+    font-size: 16px;
+  }
+
+  .hero-btn {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 0.85rem;
+  }
+
+  .service-container,
+  .about-section,
+  .service-growth-section,
+  .testimonial-slider,
+  .blog-news-grid,
+  .service-growth-heading,
+  .team-viewport,
+  .testimonial-viewport,
+  .service-growth-viewport {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .service-grid {
+    gap: 18px;
+  }
+
+  .service-card {
+    width: calc(100% - 28px);
+    padding: 16px;
+  }
+
+  .service-card h3 {
+    font-size: 18px;
+  }
+
+  .service-bottom-text {
+    font-size: 14px;
+    padding: 18px;
+  }
+
+  .service-growth-heading h2 {
+    font-size: 32px;
+  }
+
+  .service-growth-card,
+  .blog-news-card {
+    padding: 20px;
+  }
+
+  .service-growth-nav,
+  .team-nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .team-nav-left,
+  .service-growth-nav-left {
+    left: -12px;
+  }
+
+  .team-nav-right,
+  .service-growth-nav-right {
+    right: -12px;
+  }
+
+  .team-dots,
+  .service-growth-dots {
+    gap: 6px;
+  }
+
+  .testimonial-card {
+    padding: 20px;
+  }
+
+  .blog-news-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .blog-news-image {
+    height: 220px;
+  }
+}
